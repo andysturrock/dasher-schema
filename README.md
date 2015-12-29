@@ -70,7 +70,7 @@ Add the following incantation to the Post-build event command line (right-click 
 `PATH TO EXE\Dasher.Schema.Generation --targetDir=$(TargetDir) --targetPath=$(TargetPath) --projectDir=$(ProjectDir)`
 
 If you have installed the [latest version](https://www.nuget.org/packages/Dasher.Schema.Comparison) from Nuget Gallery the incantation will be:
-`$(SolutionDir)\packages\Dasher.Schema.Comparison.1.0.3.0\tools\Dasher.Schema.Comparison --manifestPath=$(ProjectDir)\App.manifest --otherManifestsDir=OTHERMANIFESTSPATH --manifestFileGlob=MANIFESTFILEGLOB`
+`$(SolutionDir)\packages\Dasher.Schema.Comparison.1.0.4.0\tools\Dasher.Schema.Comparison --manifestPath=$(ProjectDir)\App.manifest --otherManifestsDir=OTHERMANIFESTSPATH --manifestFileGlob=MANIFESTFILEGLOB`
 
 Set OTHERMANIFESTSPATH to where all your other manifests are stored.  This directory is searched recursively.
 Set MANIFESTFILEGLOB to a glob that will match the files, eg *.* to match everything, App.manifest to only match files called App.manifest.
