@@ -42,6 +42,7 @@ namespace Dasher.Schema.Comparison
             var optionSet = new OptionSet() {
                                 { "manifestPath=", o => manifestPath = o },
                                 { "otherManifestsDir=",  o => otherManifestsDir = o },
+                                { "manifestFileGlob=",  o => manifestFileGlob = o },
                                 { "debug",   v => debug = v != null },
                                 { "h|?|help",   v => help = v != null },
                                 };
@@ -100,9 +101,11 @@ namespace Dasher.Schema.Comparison
                                          select m).ToList();
                     if (otherMessages.Count == 0) // No message with same name in other manifest
                         continue;
+                    // TODO - deal with sending and receiving compatibility better
+                    // ie which way round to do the compare
                     if (otherMessages.Count > 1)
                     {
-                        throw new MessageComparisonException(otherManifestPath + " contains more than one message named " + thisMessage.Name);
+                        Console.WriteLine($"{otherManifestPath}({thisMessage.Name}) : warning: {otherManifestPath} contains more than one message named {thisMessage.Name}.  Only the first definition will be compared.");
                     }
                     var otherMessage = otherMessages.First();
                     differences.AddRange(thisMessage.CompareTo(otherMessage).ToList());
