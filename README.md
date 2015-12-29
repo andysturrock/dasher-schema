@@ -1,9 +1,12 @@
 # Dasher Schema
 
 [![Build status](https://ci.appveyor.com/api/projects/status/km8g7viqsq0lg2rx?svg=true)](https://ci.appveyor.com/project/andysturrock/dasher-schema)
+[![MetadataExtractor NuGet version](https://img.shields.io/nuget/v/Dasher.Schema.svg)](https://www.nuget.org/packages/Dasher.Schema)
+[![MetadataExtractor download stats](https://img.shields.io/nuget/dt/Dasher.Schema.svg)](https://www.nuget.org/packages/Dasher.Schema)
 
 [Dasher](https://github.com/drewnoakes/dasher) provides a way to deal at runtime with messages that mismatch in structure.  This project provides a build-time mechanism for generating explicit externalised schemas for the messages and also checking message compatibility.
 
+## Dasher.Schema Annotations
 Annotate your classes that you want to generate a schema for like this:
 ```csharp
 using Dasher.Schema;
@@ -23,8 +26,12 @@ public sealed class UserScoreWithDefaultScore
 }
 ```
 
+## Dasher.Schema.Generation
 Add the following incantation to the Post-build event command line (right-click the project->Properties->Build Events tab):
 `PATH TO EXE\Dasher.Schema.Generation --targetDir=$(TargetDir) --targetPath=$(TargetPath) --projectDir=$(ProjectDir)`
+
+If you have installed the [latest version](https://www.nuget.org/packages/Dasher.Schema.Generation/1.0.2) from Nuget Gallery the incantation will be:
+`$(SolutionDir)\packages\Dasher.Schema.Generation.1.0.2.0\tools\Dasher.Schema.Generation --targetDir=$(TargetDir) --targetPath=$(TargetPath) --projectDir=$(ProjectDir)`
 
 On a rebuild of the project a file called App.manifest will be created in the project directory and also the output directory.
 This file will look something like this:
@@ -45,6 +52,8 @@ This file will look something like this:
   <ReceivesMessages>
 </App>
 ```
+
+## Dasher.Schema.Comparison
 
 ## License
 
