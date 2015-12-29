@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Dasher.Schema.Comparison</id>
-    <version>1.0.5.0</version>
+    <version>$version$</version>
     <title>Dasher.Schema.Comparison</title>
     <authors>Andy Sturrock</authors>
     <owners>Andy Sturrock</owners>
@@ -17,8 +17,11 @@
     <copyright>Copyright Andy Sturrock 2015</copyright>
     <tags>Dasher Schema Generation Comparison</tags>
   </metadata>
+
   <files>
     <file src="bin\Release\Dasher.Schema.Comparison.exe" target="tools\" />
     <file src="bin\Release\NDesk.Options.dll" target="tools\" />
+    <file src="readme.txt" target="" />
   </files>
+  
 </package>
