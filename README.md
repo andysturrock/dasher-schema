@@ -1,6 +1,6 @@
 # Dasher Schema
 
-[![Build status](https://ci.appveyor.com/api/projects/status/72y5sk9ymgraoa9o?svg=true)](https://ci.appveyor.com/project/andysturrock/dasher-schema)
+[![Build status](https://ci.appveyor.com/api/projects/status/km8g7viqsq0lg2rx?svg=true)](https://ci.appveyor.com/project/andysturrock/dasher-schema)
 
 [Dasher](https://github.com/drewnoakes/dasher) provides a way to deal at runtime with messages that mismatch in structure.  This project provides a build-time mechanism for generating explicit externalised schemas for the messages and also checking message compatibility.
 
