@@ -24,7 +24,7 @@ public sealed class UserScoreWithDefaultScore
 ```
 
 Add the following incantation to the Post-build event command line (right-click the project->Properties->Build Events tab):
-`PATH TO EXE\Dasher.Schema.Dasher.Schema.Generation --targetDir=$(TargetDir) --targetPath=$(TargetPath) --projectDir=$(ProjectDir)`
+`PATH TO EXE\Dasher.Schema.Generation --targetDir=$(TargetDir) --targetPath=$(TargetPath) --projectDir=$(ProjectDir)`
 
 On a rebuild of the project a file called App.manifest will be created in the project directory and also the output directory.
 This file will look something like this:
