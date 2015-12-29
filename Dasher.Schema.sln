@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dasher.Schema", "Dasher.Schema\Dasher.Schema.csproj", "{3E478076-641D-406E-9523-C42CB820BDEF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dasher.Schema.Comparison", "Dasher.Schema.Comparison\Dasher.Schema.Comparison.csproj", "{3FBD00E7-9550-403E-92FF-09F52506609B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dasher.Schema.Generation", "Dasher.Schema.Generation\Dasher.Schema.Generation.csproj", "{73C6C753-3477-4548-9DAE-24A57DBBBEA0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dasher.Schema.Comparison.Tests", "Dasher.Schema.Comparison.Tests\Dasher.Schema.Comparison.Tests.csproj", "{7BC7C223-F656-4765-B197-6E26DE4696C2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dasher.Schema.Generation.Tests", "Dasher.Schema.Generation.Tests\Dasher.Schema.Generation.Tests.csproj", "{309E1C2A-A195-44F4-8905-743F725C726F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3E478076-641D-406E-9523-C42CB820BDEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E478076-641D-406E-9523-C42CB820BDEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E478076-641D-406E-9523-C42CB820BDEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E478076-641D-406E-9523-C42CB820BDEF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FBD00E7-9550-403E-92FF-09F52506609B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FBD00E7-9550-403E-92FF-09F52506609B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FBD00E7-9550-403E-92FF-09F52506609B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FBD00E7-9550-403E-92FF-09F52506609B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73C6C753-3477-4548-9DAE-24A57DBBBEA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73C6C753-3477-4548-9DAE-24A57DBBBEA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73C6C753-3477-4548-9DAE-24A57DBBBEA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73C6C753-3477-4548-9DAE-24A57DBBBEA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BC7C223-F656-4765-B197-6E26DE4696C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BC7C223-F656-4765-B197-6E26DE4696C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BC7C223-F656-4765-B197-6E26DE4696C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BC7C223-F656-4765-B197-6E26DE4696C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{309E1C2A-A195-44F4-8905-743F725C726F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{309E1C2A-A195-44F4-8905-743F725C726F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{309E1C2A-A195-44F4-8905-743F725C726F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{309E1C2A-A195-44F4-8905-743F725C726F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
