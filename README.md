@@ -40,7 +40,7 @@ On a rebuild of the project a file called App.manifest will be created in the pr
 Add the following incantation to the Post-build event command line (right-click the project->Properties->Build Events tab):
 `PATH TO EXE\Dasher.Schema.Generation --targetDir=$(TargetDir) --targetPath=$(TargetPath) --projectDir=$(ProjectDir)`
 
-If you have installed using [NuGet](https://www.nuget.org/packages/Dasher.Schema.Generation/1.0.2) from Nuget Gallery the incantation will be:
+If you have installed using [NuGet](https://www.nuget.org/packages/Dasher.Schema.Generation) from Nuget Gallery the incantation will be:
 `$(SolutionDir)\packages\Dasher.Schema.Generation.VERSION\tools\Dasher.Schema.Generation --targetDir=$(TargetDir) --targetPath=$(TargetPath) --projectDir=$(ProjectDir)`
 Make sure VERSION is pointing to the latest version.  You can see what that is from the badge above.
 
