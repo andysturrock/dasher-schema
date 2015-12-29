@@ -62,8 +62,8 @@ The App.manifest will look something like this:
 ```
 
 ## Dasher.Schema.Comparison
-[![MetadataExtractor NuGet version](https://img.shields.io/nuget/v/Dasher.Schema.Generation.svg)](https://www.nuget.org/packages/Dasher.Schema.Generation)
-[![MetadataExtractor download stats](https://img.shields.io/nuget/dt/Dasher.Schema.Generation.svg)](https://www.nuget.org/packages/Dasher.Schema.Generation)
+[![MetadataExtractor NuGet version](https://img.shields.io/nuget/v/Dasher.Schema.Comparison.svg)](https://www.nuget.org/packages/Dasher.Schema.Comparison)
+[![MetadataExtractor download stats](https://img.shields.io/nuget/dt/Dasher.Schema.Comparison.svg)](https://www.nuget.org/packages/Dasher.Schema.Comparison)
 This project compares Dasher.Schema.Generation files and determines message compatibility.
 
 Add the following incantation to the Post-build event command line (right-click the project->Properties->Build Events tab):
