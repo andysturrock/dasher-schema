@@ -6,7 +6,7 @@
 
 Annotate your classes that you want to generate a schema for like this:
 ```csharp
-using Dasher.SchemaGeneration;
+using Dasher.Schema;
 
 [ReceiveMessage]
 [SendMessage]
