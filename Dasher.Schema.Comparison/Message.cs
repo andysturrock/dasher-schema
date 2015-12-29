@@ -25,19 +25,11 @@ namespace Dasher.Schema.Comparison
         public IEnumerable<Field> Fields { get; }
 
         /// <summary>
-        /// Try to get a field with the given name.  Case is insensitive.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="field">out param containing found field</param>
-        /// <returns>True if a field is found with the given name, otherwise false</returns>
-        public bool TryGetField(string name, out Field field)
-        {
-            return nameToField.TryGetValue(name.ToLower(), out field);
-        }
-
-        /// <summary>
         /// Compare this message with other and return any incompatibilities.
         /// Fields containing fields are compared recursively.
+        /// For comparison purposes it is considered that this message is being sent,
+        /// and other is being received.  Therefore the comparison is not commutative.
+        /// Ie this.CompareTo(receiver) != receiver.CompareTo(this).
         /// </summary>
         /// <remarks>
         /// Messages are considered compatible if:
@@ -49,26 +41,26 @@ namespace Dasher.Schema.Comparison
         /// 
         /// Critical level difference will be created if:
         /// <list>
-        /// <item>other contains fields that this Message doesn't, and doesn't have defaults for those fields.</item>
+        /// <item>receiver contains fields that this Message doesn't, and doesn't have defaults for those fields.</item>
         /// <item>Field types don't match</item>
         /// </list>
         /// Warning level difference will be created if:
         /// <list>
-        /// <item>other contains fields that this Message doesn't, and has defaults for those fields.</item>
-        /// <item>this Message contains fields than other does not (1).</item>
+        /// <item>receiver contains fields that this Message doesn't, and has defaults for those fields.</item>
+        /// <item>this Message contains fields that receiver does not (1).</item>
         /// <item>Fields have same name and type but different default values.</item>
         /// </list>
         /// 
         /// (1) Using Dasher UnexpectedFieldBehaviour.Ignore mode makes this situation compatible
         ///     which is why it is only a warning.
         /// </remarks>
-        /// <param name="other"></param>
+        /// <param name="receiver"></param>
         /// <returns>Collection of differences, empty if the messages are compatible</returns>
-        public IEnumerable<FieldDifference> CompareTo(Message other)
+        public IEnumerable<FieldDifference> CompareTo(Message receiver)
         {
             var differences = new List<FieldDifference>();
-            // Check whether all fields in other exist in this message
-            foreach (var otherField in other.Fields)
+            // Check whether all fields in receiver exist in this message
+            foreach (var otherField in receiver.Fields)
             {
                 Field thisField;
                 if (nameToField.TryGetValue(otherField.Name.ToLower(), out thisField))
@@ -80,14 +72,14 @@ namespace Dasher.Schema.Comparison
                     // If there is a default value, then just a warning
                     if (otherField.DefaultValue != null)
                     {
-                        differences.Add(new FieldDifference(otherField, "This does not contain a " +
-                            otherField.Name + " field, but other has a default value.",
+                        differences.Add(new FieldDifference(otherField, "Sender does not contain a " +
+                            otherField.Name + " field, but receiver has a default value.",
                         FieldDifference.DifferenceLevelEnum.Warning));
                     }
                     else
                     {
-                        differences.Add(new FieldDifference(otherField, "This does not contain a " +
-                            otherField.Name + " field, and other has no default value.",
+                        differences.Add(new FieldDifference(otherField, "Sender does not contain a " +
+                            otherField.Name + " field, and receiver has no default value.",
                         FieldDifference.DifferenceLevelEnum.Critical));
                     }
 
@@ -97,10 +89,10 @@ namespace Dasher.Schema.Comparison
             foreach (var thisField in Fields)
             {
                 Field otherField;
-                if (!other.nameToField.TryGetValue(thisField.Name.ToLower(), out otherField))
+                if (!receiver.nameToField.TryGetValue(thisField.Name.ToLower(), out otherField))
                 {
-                    differences.Add(new FieldDifference(thisField, "This contains a " +
-                            thisField.Name + " field, but other does not.  The other consumer must use Dasher UnexpectedFieldBehaviour.Ignore mode.",
+                    differences.Add(new FieldDifference(thisField, "Sender contains a " +
+                            thisField.Name + " field, but receiver does not.  The receiver must use Dasher UnexpectedFieldBehaviour.Ignore mode.",
                         FieldDifference.DifferenceLevelEnum.Warning));
                 }
             }

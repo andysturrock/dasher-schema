@@ -218,7 +218,7 @@ namespace Dasher.Schema.Comparison.Tests
 
             Assert.Equal(6, differences.Length);
 
-            Assert.Equal("This does not contain a ExtraFieldWithNoDefault field, and other has no default value.", differences[0].Description);
+            Assert.Equal("Sender does not contain a ExtraFieldWithNoDefault field, and receiver has no default value.", differences[0].Description);
             Assert.Equal("ExtraFieldWithNoDefault", differences[0].Field.Name);
             Assert.Equal(FieldDifference.DifferenceLevelEnum.Critical, differences[0].DifferenceLevel);
 
@@ -226,19 +226,19 @@ namespace Dasher.Schema.Comparison.Tests
             Assert.Equal("XYZ", differences[1].Field.Name);
             Assert.Equal(FieldDifference.DifferenceLevelEnum.Warning, differences[1].DifferenceLevel);
 
-            Assert.Equal("This does not contain a ExtraSubFieldWithNoDefault field, and other has no default value.", differences[2].Description);
+            Assert.Equal("Sender does not contain a ExtraSubFieldWithNoDefault field, and receiver has no default value.", differences[2].Description);
             Assert.Equal("ExtraSubFieldWithNoDefault", differences[2].Field.Name);
             Assert.Equal(FieldDifference.DifferenceLevelEnum.Critical, differences[2].DifferenceLevel);
 
-            Assert.Equal("Field ABC has type System.Int32, other field has type System.Int64.", differences[3].Description);
+            Assert.Equal("Sender field ABC has type System.Int32, receiver field has type System.Int64.", differences[3].Description);
             Assert.Equal("ABC", differences[3].Field.Name);
             Assert.Equal(FieldDifference.DifferenceLevelEnum.Critical, differences[3].DifferenceLevel);
 
-            Assert.Equal("This does not contain a subXYZWithDefault field, but other has a default value.", differences[4].Description);
+            Assert.Equal("Sender does not contain a subXYZWithDefault field, but receiver has a default value.", differences[4].Description);
             Assert.Equal("subXYZWithDefault", differences[4].Field.Name);
             Assert.Equal(FieldDifference.DifferenceLevelEnum.Warning, differences[4].DifferenceLevel);
 
-            Assert.Equal("This contains a ExtraBool field, but other does not.  The other consumer must use Dasher UnexpectedFieldBehaviour.Ignore mode.",
+            Assert.Equal("Sender contains a ExtraBool field, but receiver does not.  The receiver must use Dasher UnexpectedFieldBehaviour.Ignore mode.",
                 differences[5].Description);
             Assert.Equal("ExtraBool", differences[5].Field.Name);
             Assert.Equal(FieldDifference.DifferenceLevelEnum.Warning, differences[5].DifferenceLevel);

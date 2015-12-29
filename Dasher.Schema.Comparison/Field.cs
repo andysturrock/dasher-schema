@@ -35,33 +35,39 @@ namespace Dasher.Schema.Comparison
         public string DefaultValue { get; }
         public IEnumerable<Field> Fields { get; }
 
-        public IEnumerable<FieldDifference> CompareTo(Field other)
+        /// <summary>
+        /// <see cref="Message.CompareTo(Message)"/>
+        /// 
+        /// </summary>
+        /// <param name="receiver"></param>
+        /// <returns></returns>
+        public IEnumerable<FieldDifference> CompareTo(Field receiver)
         {
             var differences = new List<FieldDifference>();
             // Warning if capitalisation is different
-            if (this.Name != other.Name)
+            if (this.Name != receiver.Name)
             {
                 differences.Add(new FieldDifference(this, "Fields have capitalisation difference: " +
-                    this.Name + " vs " + other.Name + ".",
+                    this.Name + " vs " + receiver.Name + ".",
                     FieldDifference.DifferenceLevelEnum.Warning));
             }
             // Check types
-            if (this.Type != other.Type)
+            if (this.Type != receiver.Type)
             {
-                differences.Add(new FieldDifference(this, "Field " + this.Name
-                    + " has type " + this.Type + ", other field has type " + other.Type + ".",
+                differences.Add(new FieldDifference(this, "Sender field " + this.Name
+                    + " has type " + this.Type + ", receiver field has type " + receiver.Type + ".",
                     FieldDifference.DifferenceLevelEnum.Critical));
             }
             // Check default values
-            if (this.DefaultValue != other.DefaultValue)
+            if (this.DefaultValue != receiver.DefaultValue)
             {
-                differences.Add(new FieldDifference(this, "Field " + this.Name +
-                    " has default value " + this.DefaultValue + ", other has default value " +
-                    other.DefaultValue + ".", FieldDifference.DifferenceLevelEnum.Warning));
+                differences.Add(new FieldDifference(this, "Sender field " + this.Name +
+                    " has default value " + this.DefaultValue + ", receiver has default value " +
+                    receiver.DefaultValue + ".", FieldDifference.DifferenceLevelEnum.Warning));
             }
 
             // Check whether all fields in other exist in this
-            foreach (var otherField in other.Fields)
+            foreach (var otherField in receiver.Fields)
             {
                 Field thisField;
                 if (nameToField.TryGetValue(otherField.Name.ToLower(), out thisField))
@@ -73,14 +79,14 @@ namespace Dasher.Schema.Comparison
                     // If there is a default value, then just a warning
                     if (otherField.DefaultValue != null)
                     {
-                        differences.Add(new FieldDifference(otherField, "This does not contain a " +
-                            otherField.Name + " field, but other has a default value.",
+                        differences.Add(new FieldDifference(otherField, "Sender does not contain a " +
+                            otherField.Name + " field, but receiver has a default value.",
                         FieldDifference.DifferenceLevelEnum.Warning));
                     }
                     else
                     {
-                        differences.Add(new FieldDifference(otherField, "This does not contain a " +
-                            otherField.Name + " field, and other has no default value.",
+                        differences.Add(new FieldDifference(otherField, "Sender does not contain a " +
+                            otherField.Name + " field, and receiver has no default value.",
                         FieldDifference.DifferenceLevelEnum.Critical));
                     }
 
@@ -90,10 +96,10 @@ namespace Dasher.Schema.Comparison
             foreach (var thisField in Fields)
             {
                 Field otherField;
-                if (!other.nameToField.TryGetValue(thisField.Name.ToLower(), out otherField))
+                if (!receiver.nameToField.TryGetValue(thisField.Name.ToLower(), out otherField))
                 {
-                    differences.Add(new FieldDifference(thisField, "This contains a " +
-                            thisField.Name + " field, but other does not.  The other consumer must use Dasher UnexpectedFieldBehaviour.Ignore mode.",
+                    differences.Add(new FieldDifference(thisField, "Sender contains a " +
+                            thisField.Name + " field, but receiver does not.  The receiver must use Dasher UnexpectedFieldBehaviour.Ignore mode.",
                         FieldDifference.DifferenceLevelEnum.Warning));
                 }
             }

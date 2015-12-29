@@ -75,11 +75,17 @@ namespace Dasher.Schema.Comparison
             *      Compare the messages.
             */
             var thisManifest = XDocument.Load(manifestPath);
-            var theseMessageElements = thisManifest.XPathSelectElements("//Message");
-            var theseMessages = new List<Message>();
-            foreach (var elem in theseMessageElements)
+            var theseReceivesMessageElements = thisManifest.XPathSelectElements("//ReceivesMessages/Message");
+            var theseReceivesMessages = new List<Message>();
+            foreach (var elem in theseReceivesMessageElements)
             {
-                theseMessages.Add(Message.ParseFrom(elem));
+                theseReceivesMessages.Add(Message.ParseFrom(elem));
+            }
+            var theseSendsMessageElements = thisManifest.XPathSelectElements("//SendsMessages/Message");
+            var theseSendsMessages = new List<Message>();
+            foreach (var elem in theseSendsMessageElements)
+            {
+                theseSendsMessages.Add(Message.ParseFrom(elem));
             }
 
             var otherManifestPaths = Directory.GetFiles(otherManifestsDir, manifestFileGlob, SearchOption.AllDirectories);
@@ -88,28 +94,50 @@ namespace Dasher.Schema.Comparison
             {
                 var differences = new List<FieldDifference>();
                 var otherManifest = XDocument.Load(otherManifestPath);
-                var thoseMessageElems = otherManifest.XPathSelectElements("//Message");
-                var thoseMessages = new List<Message>();
-                foreach (var elem in thoseMessageElems)
+
+                // First look where we are the receiver and the other apps are the senders
+                var thoseSendsMessageElems = otherManifest.XPathSelectElements("//SendsMessages/Message");
+                var thoseSendsMessages = new List<Message>();
+                foreach (var elem in thoseSendsMessageElems)
                 {
-                    thoseMessages.Add(Message.ParseFrom(elem));
+                    thoseSendsMessages.Add(Message.ParseFrom(elem));
                 }
-                foreach (var thisMessage in theseMessages)
+                foreach (var thisReceivesMessage in theseReceivesMessages)
                 {
-                    var otherMessages = (from m in thoseMessages
-                                         where m.Name.ToLower() == thisMessage.Name.ToLower()
+                    var otherSendMessages = (from m in thoseSendsMessages
+                                         where m.Name.ToLower() == thisReceivesMessage.Name.ToLower()
                                          select m).ToList();
-                    if (otherMessages.Count == 0) // No message with same name in other manifest
+                    if (otherSendMessages.Count == 0) // No message with same name in other manifest
                         continue;
-                    // TODO - deal with sending and receiving compatibility better
-                    // ie which way round to do the compare
-                    if (otherMessages.Count > 1)
+                    if (otherSendMessages.Count > 1)
                     {
-                        Console.WriteLine($"{otherManifestPath}({thisMessage.Name}) : warning: {otherManifestPath} contains more than one message named {thisMessage.Name}.  Only the first definition will be compared.");
+                        Console.WriteLine($"{otherManifestPath}({thisReceivesMessage.Name}) : warning: {otherManifestPath} contains more than one message named {thisReceivesMessage.Name} in the SendsMessages section.  Only the first definition will be compared.");
                     }
-                    var otherMessage = otherMessages.First();
-                    differences.AddRange(thisMessage.CompareTo(otherMessage).ToList());
+                    var otherSendsMessage = otherSendMessages.First();
+                    differences.AddRange(otherSendsMessage.CompareTo(thisReceivesMessage).ToList());
                 }
+                // Now where we are the sender and the other app are the receivers
+                var thoseReceivesMessageElems = otherManifest.XPathSelectElements("//ReceivesMessages/Message");
+                var thoseReceivesMessages = new List<Message>();
+                foreach (var elem in thoseReceivesMessageElems)
+                {
+                    thoseReceivesMessages.Add(Message.ParseFrom(elem));
+                }
+                foreach (var thisSendsMessage in theseSendsMessages)
+                {
+                    var otherReceivesMessages = (from m in thoseReceivesMessages
+                                             where m.Name.ToLower() == thisSendsMessage.Name.ToLower()
+                                             select m).ToList();
+                    if (otherReceivesMessages.Count == 0) // No message with same name in other manifest
+                        continue;
+                    if (otherReceivesMessages.Count > 1)
+                    {
+                        Console.WriteLine($"{otherManifestPath}({thisSendsMessage.Name}) : warning: {otherManifestPath} contains more than one message named {thisSendsMessage.Name} in the ReceivesMessages section.  Only the first definition will be compared.");
+                    }
+                    var otherReceivesMessage = otherReceivesMessages.First();
+                    differences.AddRange(thisSendsMessage.CompareTo(otherReceivesMessage).ToList());
+                }
+
                 foreach (var difference in differences)
                 {
                     switch (difference.DifferenceLevel)
