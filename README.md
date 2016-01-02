@@ -4,11 +4,13 @@
 
 [Dasher](https://github.com/drewnoakes/dasher) provides a way to deal at runtime with messages that mismatch in structure.  This project provides a build-time mechanism for generating explicit externalised schemas for the messages and also checking message compatibility.
 
-## Dasher.Schema Annotations
+## Dasher.Schema
 [![NuGet version](https://img.shields.io/nuget/v/Dasher.Schema.svg)](https://www.nuget.org/packages/Dasher.Schema)
 [![download stats](https://img.shields.io/nuget/dt/Dasher.Schema.svg)](https://www.nuget.org/packages/Dasher.Schema)
 This project provides attributes/annotations for classes that you want to send or receive using [Dasher](https://github.com/drewnoakes/dasher).
 The schema generation project below can then use those annotations to generate an explicit schema for your messages.
+It also provides a Serialiser and Deserialiser class which check on construction that their generic type arguments are annotated
+with ```c#[SendMessage]``` or ```c#[ReceiveMessage]``` respectively.
 
 Annotate your classes that you want to generate a schema for like this:
 ```csharp
