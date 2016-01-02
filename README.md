@@ -10,7 +10,7 @@
 This project provides attributes/annotations for classes that you want to send or receive using [Dasher](https://github.com/drewnoakes/dasher).
 The schema generation project below can then use those annotations to generate an explicit schema for your messages.
 It also provides a Serialiser and Deserialiser class which check on construction that their generic type arguments are annotated
-with ```c#[SendMessage]``` or ```c#[ReceiveMessage]``` respectively.
+with `[SendMessage]` or `[ReceiveMessage]` respectively.
 
 Annotate your classes that you want to generate a schema for like this:
 ```csharp
