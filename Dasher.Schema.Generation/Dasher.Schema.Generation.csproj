@@ -54,7 +54,6 @@
     <Compile Include="XMLSchemaGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="Dasher.Schema.Generation.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
