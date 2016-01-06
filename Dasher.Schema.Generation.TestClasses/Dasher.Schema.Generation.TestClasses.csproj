@@ -2,13 +2,13 @@
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{73C6C753-3477-4548-9DAE-24A57DBBBEA0}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{85CFC5B1-5847-4A73-ACD1-CE1B340F9072}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Dasher.Schema.Generation</RootNamespace>
-    <AssemblyName>Dasher.Schema.Generation</AssemblyName>
+    <RootNamespace>Dasher.Schema.Generation.TestClasses</RootNamespace>
+    <AssemblyName>Dasher.Schema.Generation.TestClasses</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -30,14 +30,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="NDesk.Options, Version=0.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NDesk.Options.0.2.1\lib\NDesk.Options.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -48,22 +41,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppArguments.cs" />
-    <Compile Include="AssemblyWalker.cs" />
-    <Compile Include="DasherAssemblyInfo.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Classes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SchemaGenerationException.cs" />
-    <Compile Include="SchemaGenerator.cs" />
-    <Compile Include="XMLSchemaGenerator.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Dasher.Schema.Generation.nuspec" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dasher.Schema\Dasher.Schema.csproj">
-      <Project>{3e478076-641d-406e-9523-c42cb820bdef}</Project>
+      <Project>{3E478076-641D-406E-9523-C42CB820BDEF}</Project>
       <Name>Dasher.Schema</Name>
     </ProjectReference>
   </ItemGroup>
