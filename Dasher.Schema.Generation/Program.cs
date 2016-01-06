@@ -81,7 +81,7 @@ namespace Dasher.Schema.Generation
             // TODO this is verbose.  Tidy up using Linq?
             foreach (Type t in assembly.GetTypes())
             {
-                foreach (var attribute in t.GetCustomAttributes())
+                foreach (var attribute in t.GetCustomAttributes(false))
                 {
                     if (attribute is SendMessageAttribute)
                     {
