@@ -17,7 +17,7 @@
     <copyright>Copyright Andy Sturrock 2015</copyright>
     <tags>Dasher Schema Generation</tags>
     <dependencies>
-      <dependency id="Dasher.Schema" version="0.2.1" />
+      <dependency id="Dasher.Schema" version="1.1.5845.24621" />
     </dependencies>
   </metadata>
   <files>
