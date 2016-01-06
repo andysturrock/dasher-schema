@@ -58,7 +58,7 @@ namespace Dasher.Schema.Generation
 
             if (help)
             {
-                Usage();
+                Usage(Console.Out);
                 return ReturnCode.EXIT_SUCCESS;
             }
 
@@ -69,7 +69,7 @@ namespace Dasher.Schema.Generation
             {
                 // This format makes it show up properly in the VS Error window.
                 Console.WriteLine("Dasher.Schema.Generation.exe : error: Incorrect command line arguments.");
-                Usage();
+                Usage(Console.Error);
                 return ReturnCode.EXIT_ERROR;
             }
 
@@ -155,10 +155,10 @@ namespace Dasher.Schema.Generation
             doc.Save(appManifestFileName);
         }
 
-        private static void Usage()
+        private static void Usage(TextWriter writer)
         {
-            Console.WriteLine("Usage: Dasher.Schema.Generation.exe --targetDir=TARGETDIR --targetName=TARGETNAME --projectDir=PROJECTDIR [--debug] [--help|-h|-?");
-            Console.WriteLine("TARGETDIR is the output directory of the project.  TARGETNAME is the full path of the project target.  PROJECTDIR is the root dir of the project, where the app.messages file will be written.");
+            writer.WriteLine("Usage: Dasher.Schema.Generation.exe --targetDir=TARGETDIR --targetName=TARGETNAME --projectDir=PROJECTDIR [--debug] [--help|-h|-?");
+            writer.WriteLine("TARGETDIR is the output directory of the project.  TARGETNAME is the full path of the project target.  PROJECTDIR is the root dir of the project, where the app.messages file will be written.");
         }
     }
 }
