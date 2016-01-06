@@ -60,10 +60,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LoadArgumentsTests.cs" />
+    <Compile Include="LoadAssemblyTests.cs" />
     <Compile Include="XMLSchemaGeneratorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Dasher.Schema.Generation.TestClasses\Dasher.Schema.Generation.TestClasses.csproj">
+      <Project>{85cfc5b1-5847-4a73-acd1-ce1b340f9072}</Project>
+      <Name>Dasher.Schema.Generation.TestClasses</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dasher.Schema.Generation\Dasher.Schema.Generation.csproj">
       <Project>{73c6c753-3477-4548-9dae-24a57dbbbea0}</Project>
       <Name>Dasher.Schema.Generation</Name>
