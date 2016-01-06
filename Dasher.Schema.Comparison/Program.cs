@@ -165,7 +165,7 @@ namespace Dasher.Schema.Comparison
         private static void Usage()
         {
             Console.WriteLine("Usage: Dasher.Schema.Comparison.exe --manifestPath=MANIFESTPATH --otherManifestsDir=OTHERMANIFESTSPATH --manifestFileGlob=MANIFESTFILEGLOB [--debug] [--help|-h|-?");
-            Console.WriteLine("TARGETDIR is the output directory of the project.");
+            Console.WriteLine("MANIFESTPATH the path to the manifest to source the messages from.");
             Console.WriteLine("OTHERMANIFESTSPATH is the top level directory, under which to search for other manifest files to compare messages.");
             Console.WriteLine("MANIFESTFILEGLOB is the filename pattern to use to match manifest files.  Eg *.* will match all files, App.manifest will only consider files called App.manifest.");
         }

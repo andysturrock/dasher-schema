@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using NDesk.Options;
 
 namespace Dasher.Schema.Generation
@@ -32,7 +33,7 @@ namespace Dasher.Schema.Generation
             returnCode = ReturnCode.EXIT_SUCCESS;
             if (Help)
             {
-                Usage();
+                Usage(Console.Out);
                 returnCode = ReturnCode.EXIT_SUCCESS;
                 return false;
             }
@@ -44,7 +45,7 @@ namespace Dasher.Schema.Generation
             {
                 // This format makes it show up properly in the VS Error window.
                 Console.WriteLine("Dasher.Schema.Generation.exe : error: Incorrect command line arguments.");
-                Usage();
+                Usage(Console.Error);
                 returnCode = ReturnCode.EXIT_ERROR;
                 return false;
             }
@@ -52,7 +53,7 @@ namespace Dasher.Schema.Generation
 
         }
 
-        private static void Usage()
+        private static void Usage(TextWriter writer)
         {
             Console.WriteLine(
                 "Usage: Dasher.Schema.Generation.exe --targetDir=TARGETDIR --targetName=TARGETNAME --projectDir=PROJECTDIR [--debug] [--help|-h|-?");
