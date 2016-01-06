@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Dasher.Schema.Generation</id>
-    <version>1.0.2.0</version>
+    <version>$version$</version>
     <title>Dasher.Schema.Generation</title>
     <authors>Andy Sturrock</authors>
     <owners>Andy Sturrock</owners>
