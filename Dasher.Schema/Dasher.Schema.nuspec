@@ -18,6 +18,5 @@
     <tags>Dasher Schema</tags>
   </metadata>
   <files>
-    <file src="bin\Release\Dasher.Schema.dll" target="lib\net45\" />
   </files>
 </package>
