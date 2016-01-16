@@ -79,7 +79,7 @@ If you have installed using [NuGet](https://www.nuget.org/packages/Dasher.Schema
 
 Make sure VERSION is pointing to the latest version.  You can see what that is from the badge above.
 Set OTHERMANIFESTSPATH to where all your other manifests are stored.  This directory is searched recursively.
-Set MANIFESTFILEGLOB to a glob that will match the files, eg *.* to match everything, App.manifest to only match files called App.manifest.
+Set MANIFESTFILEGLOB to a glob that will match the files, eg \*.\* to match everything, App.manifest to only match files called App.manifest.
 
 
 ## License
