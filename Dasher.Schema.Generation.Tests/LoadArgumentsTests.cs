@@ -15,13 +15,16 @@ namespace Dasher.Schema.Generation.Tests
         public void LoadArgumentTest()
         {
             AppArguments appArgs = new AppArguments();
-            appArgs.LoadArguments(new[] { @"--targetPath=C:\TargetPath", @"--targetDir=C:\TargetDir", @"--projectDir=C:\ProjectDir" });
+            appArgs.LoadArguments(new[] { @"--targetPath=C:\TargetPath", @"--targetDir=C:\TargetDir", @"--projectDir=C:\ProjectDir",
+                @"--includeDependencies=BP.*,Something", @"--excludeDependencies=Microsoft.*,BP.Synergy.App" });
             ReturnCode retCode;
             Assert.True(appArgs.ValidateArguments(out retCode));
             Assert.Equal(ReturnCode.EXIT_SUCCESS, retCode);
             Assert.Equal(@"C:\TargetPath", appArgs.TargetPath);
             Assert.Equal(@"C:\TargetDir", appArgs.TargetDir);
             Assert.Equal(@"C:\ProjectDir", appArgs.ProjectDir);
+            Assert.Equal(@"BP.*,Something", appArgs.IncludedDependencies);
+            Assert.Equal(@"Microsoft.*,BP.Synergy.App", appArgs.ExcludedDependencies);
         }
 
         [Fact]

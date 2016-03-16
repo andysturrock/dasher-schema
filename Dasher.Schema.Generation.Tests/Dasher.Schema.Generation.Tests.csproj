@@ -70,6 +70,10 @@
       <Project>{85cfc5b1-5847-4a73-acd1-ce1b340f9072}</Project>
       <Name>Dasher.Schema.Generation.TestClasses</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Dasher.Schema.Generation.TestRefAssembly\Dasher.Schema.Generation.TestRefAssembly.csproj">
+      <Project>{C2B06DE3-44C8-4ED2-A2DB-9B905CF59EFF}</Project>
+      <Name>Dasher.Schema.Generation.TestRefAssembly</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dasher.Schema.Generation\Dasher.Schema.Generation.csproj">
       <Project>{73c6c753-3477-4548-9dae-24a57dbbbea0}</Project>
       <Name>Dasher.Schema.Generation</Name>

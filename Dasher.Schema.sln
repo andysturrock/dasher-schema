@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dasher.Schema", "Dasher.Schema\Dasher.Schema.csproj", "{3E478076-641D-406E-9523-C42CB820BDEF}"
 EndProject
@@ -20,6 +20,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dasher.Schema.Generation.TestClasses", "Dasher.Schema.Generation.TestClasses\Dasher.Schema.Generation.TestClasses.csproj", "{85CFC5B1-5847-4A73-ACD1-CE1B340F9072}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dasher.Schema.Generation.TestRefAssembly", "Dasher.Schema.Generation.TestRefAssembly\Dasher.Schema.Generation.TestRefAssembly.csproj", "{C2B06DE3-44C8-4ED2-A2DB-9B905CF59EFF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{52F690E9-CD8F-4D42-8B9B-49CCDBB4A482}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,8 +55,18 @@ Global
 		{85CFC5B1-5847-4A73-ACD1-CE1B340F9072}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{85CFC5B1-5847-4A73-ACD1-CE1B340F9072}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{85CFC5B1-5847-4A73-ACD1-CE1B340F9072}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2B06DE3-44C8-4ED2-A2DB-9B905CF59EFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2B06DE3-44C8-4ED2-A2DB-9B905CF59EFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2B06DE3-44C8-4ED2-A2DB-9B905CF59EFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2B06DE3-44C8-4ED2-A2DB-9B905CF59EFF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7BC7C223-F656-4765-B197-6E26DE4696C2} = {52F690E9-CD8F-4D42-8B9B-49CCDBB4A482}
+		{309E1C2A-A195-44F4-8905-743F725C726F} = {52F690E9-CD8F-4D42-8B9B-49CCDBB4A482}
+		{85CFC5B1-5847-4A73-ACD1-CE1B340F9072} = {52F690E9-CD8F-4D42-8B9B-49CCDBB4A482}
+		{C2B06DE3-44C8-4ED2-A2DB-9B905CF59EFF} = {52F690E9-CD8F-4D42-8B9B-49CCDBB4A482}
 	EndGlobalSection
 EndGlobal
