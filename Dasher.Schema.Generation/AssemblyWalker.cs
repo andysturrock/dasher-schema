@@ -75,9 +75,10 @@ namespace Dasher.Schema.Generation
             return referencedAssemblies.Where(a =>
                 !ExcludedPrefixes.Any(e => a.Name.StartsWith(e, StringComparison.OrdinalIgnoreCase))
             &&  !ExcludedAssemblies.Any(e => a.Name.Equals(e, StringComparison.OrdinalIgnoreCase))
-            && ((IncludedPrefixes.Any() && IncludedPrefixes.Any(e => a.Name.StartsWith(e, StringComparison.OrdinalIgnoreCase))) 
-            || (IncludedAssemblies.Any() && IncludedAssemblies.Any(e => a.Name.Equals(e, StringComparison.OrdinalIgnoreCase))))
-            ).ToList();
+            && ((IncludedPrefixes.Any() && IncludedPrefixes.Any(e => a.Name.StartsWith(e, StringComparison.OrdinalIgnoreCase)))
+            || (IncludedAssemblies.Any() && IncludedAssemblies.Any(e => a.Name.Equals(e, StringComparison.OrdinalIgnoreCase)))
+            || (!IncludedPrefixes.Any() && !IncludedAssemblies.Any())
+            )).ToList();
         }
 
         private Assembly TryLoadAssembly(string dir, AssemblyName refAssemblyName)

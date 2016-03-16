@@ -98,14 +98,112 @@ namespace Dasher.Schema.Generation.Tests
         {
             var aw = new AssemblyWalker("IncludedAssembly,Included.*", "ExcludedAssembly,Excluded.*");
             var proxy = new AssemblyWalkerProxy(aw);
-            AssemblyName[] assemblies = { new AssemblyName("Dasher"), new AssemblyName("System"), new AssemblyName("System.Core"), new AssemblyName("Microsoft"),
-                new AssemblyName("Microsoft.Bill"), new AssemblyName("Included.Assembly"), new AssemblyName("IncludedAssembly"), new AssemblyName("ExcludedAssembly"), new AssemblyName("Excluded.Assembly"),  };
-            var result = proxy.GetFilteredReferencedAssemblyNames(assemblies);
+            var result = proxy.GetFilteredReferencedAssemblyNames(GetTestAssemblies());
             Assert.NotNull(result);
             Assert.Equal(2, result.Count());
             Assert.Equal("Included.Assembly", result[0].Name);
             Assert.Equal("IncludedAssembly", result[1].Name);
         }
 
+        [Fact]
+        public void FilterReferencedAssembliesExcludedTest()
+        {
+            var aw = new AssemblyWalker(null, "ExcludedAssembly,Excluded.*");
+            var proxy = new AssemblyWalkerProxy(aw);
+            var result = proxy.GetFilteredReferencedAssemblyNames(GetTestAssemblies());
+            Assert.NotNull(result);
+            Assert.Equal(2, result.Count());
+            Assert.Equal("Included.Assembly", result[0].Name);
+            Assert.Equal("IncludedAssembly", result[1].Name);
+        }
+
+        [Fact]
+        public void FilterReferencedAssembliesIncludedTest()
+        {
+            var aw = new AssemblyWalker("IncludedAssembly,Included.*", null);
+            var proxy = new AssemblyWalkerProxy(aw);
+            var result = proxy.GetFilteredReferencedAssemblyNames(GetTestAssemblies());
+            Assert.NotNull(result);
+            Assert.Equal(2, result.Count());
+            Assert.Equal("Included.Assembly", result[0].Name);
+            Assert.Equal("IncludedAssembly", result[1].Name);
+        }        
+
+        [Fact]
+        public void FilterReferencedAssembliesEmptyTest()
+        {
+            var aw = new AssemblyWalker(null, null);
+            var proxy = new AssemblyWalkerProxy(aw);
+            var result = proxy.GetFilteredReferencedAssemblyNames(GetTestAssemblies());
+            Assert.NotNull(result);
+            Assert.Equal(4, result.Count());
+            Assert.Equal("Included.Assembly", result[0].Name);
+            Assert.Equal("IncludedAssembly", result[1].Name);
+        }
+
+        [Fact]
+        public void FilterReferencedAssembliesOneExcludedTest()
+        {
+            var aw = new AssemblyWalker(null, "ExcludedAssembly");
+            var proxy = new AssemblyWalkerProxy(aw);
+            var result = proxy.GetFilteredReferencedAssemblyNames(GetTestAssemblies());
+            Assert.NotNull(result);
+            Assert.Equal(3, result.Count());
+            Assert.Equal("Included.Assembly", result[0].Name);
+            Assert.Equal("IncludedAssembly", result[1].Name);
+            Assert.Equal("Excluded.Assembly", result[2].Name);
+        }
+
+        [Fact]
+        public void FilterReferencedAssembliesOneIncludedTest()
+        {
+            var aw = new AssemblyWalker("IncludedAssembly", "ExcludedAssembly,Excluded.*");
+            var proxy = new AssemblyWalkerProxy(aw);
+            var result = proxy.GetFilteredReferencedAssemblyNames(GetTestAssemblies());
+            Assert.NotNull(result);
+            Assert.Equal(1, result.Count());            
+            Assert.Equal("IncludedAssembly", result[0].Name);
+        }
+
+        [Fact]
+        public void FilterReferencedAssembliesIncludedNotExistTest()
+        {
+            var aw = new AssemblyWalker("NotExist", "ExcludedAssembly,Excluded.*");
+            var proxy = new AssemblyWalkerProxy(aw);
+            var result = proxy.GetFilteredReferencedAssemblyNames(GetTestAssemblies());
+            Assert.NotNull(result);
+            Assert.Equal(0, result.Count());
+        }
+
+        [Fact]
+        public void FilterReferencedAssembliesIncludedNotExistPrefixTest()
+        {
+            var aw = new AssemblyWalker("NotExist*", "ExcludedAssembly,Excluded.*");
+            var proxy = new AssemblyWalkerProxy(aw);
+            var result = proxy.GetFilteredReferencedAssemblyNames(GetTestAssemblies());
+            Assert.NotNull(result);
+            Assert.Equal(0, result.Count());
+        }
+
+        [Fact]
+        public void FilterReferencedAssembliesIncludedNotExistBothTest()
+        {
+            var aw = new AssemblyWalker("NotExist*,NotExist", "ExcludedAssembly,Excluded.*");
+            var proxy = new AssemblyWalkerProxy(aw);
+            var result = proxy.GetFilteredReferencedAssemblyNames(GetTestAssemblies());
+            Assert.NotNull(result);
+            Assert.Equal(0, result.Count());
+        }
+        private static AssemblyName[] GetTestAssemblies()
+        {
+            AssemblyName[] assemblies =
+            {
+                new AssemblyName("Dasher"), new AssemblyName("System"), new AssemblyName("System.Core"),
+                new AssemblyName("Microsoft"),
+                new AssemblyName("Microsoft.Bill"), new AssemblyName("Included.Assembly"), new AssemblyName("IncludedAssembly"),
+                new AssemblyName("ExcludedAssembly"), new AssemblyName("Excluded.Assembly"),
+            };
+            return assemblies;
+        }
     }
 }
