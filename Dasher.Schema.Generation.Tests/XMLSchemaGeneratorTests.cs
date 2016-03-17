@@ -18,6 +18,20 @@ namespace Dasher.Schema.Generation.Tests
             public string Name { get; }
             public int Score { get; }
         }
+
+        [SendMessage("SendDesc")]
+        [ReceiveMessage("ReceiveDesc")]
+        public sealed class UserScoreWithDescription
+        {
+            public UserScoreWithDescription(string name, int score)
+            {
+                Name = name;
+                Score = score;
+            }
+
+            public string Name { get; }
+            public int Score { get; }
+        }
         public sealed class UserScoreWithDefaultScore
         {
             public UserScoreWithDefaultScore(string name, int score = 100)
@@ -150,6 +164,24 @@ namespace Dasher.Schema.Generation.Tests
                     );
 
             var actual = XMLSchemaGenerator.GenerateSchema(typeof(UserScore));
+            // Comparing XElements seems problematic, so bodge it by comparing
+            // the string forms.
+            Assert.Equal(expected.ToString(), actual.ToString());
+        }
+
+        [Fact]
+        public void GenerateXMLSchemaForTypeWithDescription()
+        {
+            var expected = new XElement("Message", new XAttribute("name", "UserScoreWithDescription"), new XAttribute("description", "SendDesc"),
+                new XElement("Field",
+                    new XAttribute("name", "name"),
+                    new XAttribute("type", "System.String")),
+                new XElement("Field",
+                    new XAttribute("name", "score"),
+                    new XAttribute("type", "System.Int32"))
+                    );
+
+            var actual = XMLSchemaGenerator.GenerateSchema(typeof(UserScoreWithDescription));
             // Comparing XElements seems problematic, so bodge it by comparing
             // the string forms.
             Assert.Equal(expected.ToString(), actual.ToString());

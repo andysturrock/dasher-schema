@@ -2,16 +2,15 @@
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3E478076-641D-406E-9523-C42CB820BDEF}</ProjectGuid>
+    <ProjectGuid>{C2B06DE3-44C8-4ED2-A2DB-9B905CF59EFF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Dasher.Schema</RootNamespace>
-    <AssemblyName>Dasher.Schema</AssemblyName>
+    <RootNamespace>Dasher.Schema.Generation.TestRefAssembly</RootNamespace>
+    <AssemblyName>Dasher.Schema.Generation.TestRefAssembly</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,10 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dasher, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dasher.0.4.3\lib\net45\Dasher.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -45,15 +40,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attributes.cs" />
-    <Compile Include="DasherSchemaException.cs" />
-    <Compile Include="Deserialiser.cs" />
+    <Compile Include="DummyClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Serialiser.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Dasher.Schema.nuspec" />
-    <None Include="packages.config" />
+    <ProjectReference Include="..\Dasher.Schema.Generation.TestClasses\Dasher.Schema.Generation.TestClasses.csproj">
+      <Project>{85CFC5B1-5847-4A73-ACD1-CE1B340F9072}</Project>
+      <Name>Dasher.Schema.Generation.TestClasses</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

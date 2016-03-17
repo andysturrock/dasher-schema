@@ -19,7 +19,8 @@ namespace Dasher.Schema.Generation
         public void GenerateSchema(AppArguments args)
         {
             var assembly = Assembly.LoadFrom(args.TargetPath);
-            var assemblyInfo = AssemblyWalker.GetDasherAssemblyInfo(assembly);
+            var aw = new AssemblyWalker(args.IncludedDependencies, args.ExcludedDependencies);
+            var assemblyInfo = aw.GetDasherAssemblyInfo(assembly);
 
             // Write to the project (ie source) dir and also the target (ie bin) dir.
             // This ensures the manifest is checked into source control but is also
