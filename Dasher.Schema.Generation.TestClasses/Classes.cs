@@ -6,32 +6,30 @@ using System.Threading.Tasks;
 
 namespace Dasher.Schema.Generation.TestClasses
 {
-    [SendMessage]
+    [DasherMessage(MessageDirection.SendOnly)]
     public class Sender
     {
     }
 
-    [ReceiveMessage]
+    [DasherMessage(MessageDirection.ReceiveOnly)]
     public class Receiver
     {
         
     }
 
-    [SendMessage]
-    [ReceiveMessage]
+    [DasherMessage(MessageDirection.SendReceive)]
     public class SenderAndReceiver
     {
         
     }
 
-    [SendMessage]
-    [ReceiveMessage]
+    [DasherMessage(MessageDirection.SendReceive)]
     public class BaseSenderReceiver
     {
         
     }
 
-    [SendMessage]
+    [DasherMessage(MessageDirection.SendOnly)]
     public class DerivedSender : BaseSenderReceiver
     {
         

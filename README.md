@@ -9,15 +9,13 @@
 [![download stats](https://img.shields.io/nuget/dt/Dasher.Schema.svg)](https://www.nuget.org/packages/Dasher.Schema)
 This project provides attributes/annotations for classes that you want to send or receive using [Dasher](https://github.com/drewnoakes/dasher).
 The schema generation project below can then use those annotations to generate an explicit schema for your messages.
-It also provides Serialiser and Deserialiser classes which check (on construction) that their generic type arguments are annotated
-with `[SendMessage]` or `[ReceiveMessage]` respectively.
+It also provides Serialiser and Deserialiser classes which check (on construction) that their generic type arguments are annotated with the `[DasherMessage]` attribute parameterised with the correct `usage` (`SendOnly`, `ReceiveOnly` or `SendReceive`, as appropriate).
 
 Annotate your classes that you want to generate a schema for like this:
 ```csharp
 using Dasher.Schema;
 
-[ReceiveMessage]
-[SendMessage]
+[DasherMessage(MessageDirection.SendReceive)]
 public sealed class UserScoreWithDefaultScore
 {
     public UserScoreWithDefaultScore(string name, int score = 100)

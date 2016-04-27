@@ -19,8 +19,7 @@ namespace Dasher.Schema.Generation.Tests
             public int Score { get; }
         }
 
-        [SendMessage("SendDesc")]
-        [ReceiveMessage("ReceiveDesc")]
+        [DasherMessage(MessageDirection.SendReceive, "Message description")]
         public sealed class UserScoreWithDescription
         {
             public UserScoreWithDescription(string name, int score)
@@ -172,7 +171,7 @@ namespace Dasher.Schema.Generation.Tests
         [Fact]
         public void GenerateXMLSchemaForTypeWithDescription()
         {
-            var expected = new XElement("Message", new XAttribute("name", "UserScoreWithDescription"), new XAttribute("description", "SendDesc"),
+            var expected = new XElement("Message", new XAttribute("name", "UserScoreWithDescription"), new XAttribute("description", "Message description"),
                 new XElement("Field",
                     new XAttribute("name", "name"),
                     new XAttribute("type", "System.String")),

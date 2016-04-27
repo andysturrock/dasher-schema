@@ -17,8 +17,8 @@ namespace Dasher.Schema.Generation
 
         private static string GetDescription(Type type)
         {
-             var atrs = type.GetCustomAttributes(typeof(SynergyMessageBaseAttribute));
-             var atr = (SynergyMessageBaseAttribute) atrs.FirstOrDefault();
+             var atrs = type.GetCustomAttributes(typeof(DasherMessageAttribute));
+             var atr = (DasherMessageAttribute) atrs.FirstOrDefault();
              return atr?.Description;
         }
 

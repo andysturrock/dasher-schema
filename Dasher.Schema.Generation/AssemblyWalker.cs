@@ -51,9 +51,10 @@ namespace Dasher.Schema.Generation
             if (depth > 2) return; //just in case of circular references. Too large number slows down the whole operation
             foreach (var t in assembly.GetTypes())
             {
-                if (t.GetCustomAttributes(typeof(SendMessageAttribute), false).Any())
+                var attributes = t.GetCustomAttributes(typeof(DasherMessageAttribute), false).Cast<DasherMessageAttribute>().ToList();
+                if (attributes.Any(a => a.Usage == MessageDirection.SendOnly || a.Usage == MessageDirection.SendReceive))
                     result.SendMessageTypes.Add(t);
-                if (t.GetCustomAttributes(typeof(ReceiveMessageAttribute), false).Any())
+                if (attributes.Any(a => a.Usage == MessageDirection.ReceiveOnly || a.Usage == MessageDirection.SendReceive))
                     result.ReceiveMessageTypes.Add(t);
             }
             var referencedAssemblyNames = GetFilteredReferencedAssemblyNames(assembly.GetReferencedAssemblies());
