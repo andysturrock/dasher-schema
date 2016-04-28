@@ -16,10 +16,11 @@ namespace Dasher.Schema
 
         public Serialiser()
         {
-            var attributes = typeof(T).GetCustomAttributes(typeof(DasherMessageAttribute), true).Cast<DasherMessageAttribute>().ToList();
-            if (attributes.Count < 1 || attributes.Any(a => a.Usage == MessageDirection.ReceiveOnly))
+            var attributes = typeof(T).GetCustomAttributes(typeof(DasherSerialisableAttribute), true).Cast<DasherSerialisableAttribute>().ToList();
+            if (attributes.Count < 1 || attributes.Any(a => a.Usage == SupportedOperations.DeserialiseOnly))
             {
-                throw new DasherSchemaException("Type must have a DasherMessage attribute with usage parameter of SendOnly or SendReceive.", typeof(T));
+                throw new DasherSchemaException(
+                    "Type must have a DasherSerialisable attribute with usage parameter of SerialiseOnly or SerialiseDeserialise.", typeof(T));
             }
             _inner = new Dasher.Serialiser<T>();
         }

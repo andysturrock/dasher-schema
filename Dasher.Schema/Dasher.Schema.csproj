@@ -45,7 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DasherMessageAttribute.cs" />
+    <Compile Include="DasherSerialisableAttribute.cs" />
     <Compile Include="DasherSchemaException.cs" />
     <Compile Include="Deserialiser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -19,7 +19,7 @@ namespace Dasher.Schema.Generation.Tests
             public int Score { get; }
         }
 
-        [DasherMessage(MessageDirection.SendReceive, "Message description")]
+        [DasherSerialisable(SupportedOperations.SerialiseDeserialise, "Message description")]
         public sealed class UserScoreWithDescription
         {
             public UserScoreWithDescription(string name, int score)

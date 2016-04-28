@@ -22,10 +22,11 @@ namespace Dasher.Schema
 
         public Deserialiser(UnexpectedFieldBehaviour unexpectedFieldBehaviour = Schema.UnexpectedFieldBehaviour.Throw)
         {
-            var attributes = typeof(T).GetCustomAttributes(typeof(DasherMessageAttribute), true).Cast<DasherMessageAttribute>().ToList();
-            if (attributes.Count < 1 || attributes.Any(a => a.Usage == MessageDirection.SendOnly))
+            var attributes = typeof(T).GetCustomAttributes(typeof(DasherSerialisableAttribute), true).Cast<DasherSerialisableAttribute>().ToList();
+            if (attributes.Count < 1 || attributes.Any(a => a.Usage == SupportedOperations.SerialiseOnly))
             {
-                throw new DasherSchemaException("Type must have a DasherMessage attribute with usage parameter of ReceiveOnly or SendReceive.", typeof(T));
+                throw new DasherSchemaException(
+                    "Type must have a DasherSerialisable attribute with usage parameter of DeserialiseOnly or SerialiseDeserialise.", typeof(T));
             }
             _inner = new Dasher.Deserialiser<T>((Dasher.UnexpectedFieldBehaviour)unexpectedFieldBehaviour);
         }
