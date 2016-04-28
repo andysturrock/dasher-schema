@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Xml.Linq;
 
 namespace Dasher.Schema.Comparison
 {
     public class Message
     {
-        private Dictionary<string, Field> nameToField = new Dictionary<string, Field>();
+        private readonly Dictionary<string, Field> _nameToField = new Dictionary<string, Field>();
 
         public Message(string name, IEnumerable<Field> fields)
         {
@@ -17,7 +13,7 @@ namespace Dasher.Schema.Comparison
             Fields = fields;
             foreach (var field in Fields)
             {
-                nameToField[field.Name.ToLower()] = field;
+                _nameToField[field.Name.ToLower()] = field;
             }
         }
 
@@ -63,7 +59,7 @@ namespace Dasher.Schema.Comparison
             foreach (var otherField in receiver.Fields)
             {
                 Field thisField;
-                if (nameToField.TryGetValue(otherField.Name.ToLower(), out thisField))
+                if (_nameToField.TryGetValue(otherField.Name.ToLower(), out thisField))
                 {
                     differences.AddRange(thisField.CompareTo(otherField));
                 }
@@ -89,7 +85,7 @@ namespace Dasher.Schema.Comparison
             foreach (var thisField in Fields)
             {
                 Field otherField;
-                if (!receiver.nameToField.TryGetValue(thisField.Name.ToLower(), out otherField))
+                if (!receiver._nameToField.TryGetValue(thisField.Name.ToLower(), out otherField))
                 {
                     differences.Add(new FieldDifference(thisField, "Sender contains a " +
                             thisField.Name + " field, but receiver does not.  The receiver must use Dasher UnexpectedFieldBehaviour.Ignore mode.",
