@@ -19,7 +19,7 @@ namespace Dasher.Schema.Generation.Tests
             public int Score { get; }
         }
 
-        [DasherSerialisable(SupportedOperations.SerialiseDeserialise, "Message description")]
+        [DasherSerialisable(SupportedOperations.SerialiseDeserialise, "Type description")]
         public sealed class UserScoreWithDescription
         {
             public UserScoreWithDescription(string name, int score)
@@ -147,13 +147,12 @@ namespace Dasher.Schema.Generation.Tests
         public void GenerateXMLSchemaForSimpleType()
         {
             /*
-            <Message = "UserScore">
+            <Type name="UserScore">
               <Field name="name" type="System.String" />
-              <Field name="score" type = "System.Int32" />
-            </UserScore>
+              <Field name="score" type="System.Int32" />
+            </Type>
             */
-
-            var expected = new XElement("Message", new XAttribute("name", "UserScore"),
+            var expected = new XElement("Type", new XAttribute("name", "UserScore"),
                 new XElement("Field",
                     new XAttribute("name", "name"),
                     new XAttribute("type", "System.String")),
@@ -162,7 +161,7 @@ namespace Dasher.Schema.Generation.Tests
                     new XAttribute("type", "System.Int32"))
                     );
 
-            var actual = XMLSchemaGenerator.GenerateSchema(typeof(UserScore));
+            var actual = XMLSchemaGenerator.GenerateSchema(typeof(UserScore), "Type");
             // Comparing XElements seems problematic, so bodge it by comparing
             // the string forms.
             Assert.Equal(expected.ToString(), actual.ToString());
@@ -171,7 +170,7 @@ namespace Dasher.Schema.Generation.Tests
         [Fact]
         public void GenerateXMLSchemaForTypeWithDescription()
         {
-            var expected = new XElement("Message", new XAttribute("name", "UserScoreWithDescription"), new XAttribute("description", "Message description"),
+            var expected = new XElement("Type", new XAttribute("name", "UserScoreWithDescription"), new XAttribute("description", "Type description"),
                 new XElement("Field",
                     new XAttribute("name", "name"),
                     new XAttribute("type", "System.String")),
@@ -180,7 +179,7 @@ namespace Dasher.Schema.Generation.Tests
                     new XAttribute("type", "System.Int32"))
                     );
 
-            var actual = XMLSchemaGenerator.GenerateSchema(typeof(UserScoreWithDescription));
+            var actual = XMLSchemaGenerator.GenerateSchema(typeof(UserScoreWithDescription), "Type");
             // Comparing XElements seems problematic, so bodge it by comparing
             // the string forms.
             Assert.Equal(expected.ToString(), actual.ToString());
@@ -190,12 +189,12 @@ namespace Dasher.Schema.Generation.Tests
         public void GenerateXMLSchemaForSimpleTypeWithDefaults()
         {
             /*
-            <Message name=UserScoreWithDefaultScore">
+            <Type name=UserScoreWithDefaultScore">
               <Field name="name" type="System.String" />
               <Field name="score" type="System.Int32" default="100" />
-            </UserScoreWithDefaultScore>
+            </Type>
             */
-            var expected = new XElement("Message", new XAttribute("name", "UserScoreWithDefaultScore"),
+            var expected = new XElement("Type", new XAttribute("name", "UserScoreWithDefaultScore"),
                             new XElement("Field",
                                 new XAttribute("name", "name"),
                                 new XAttribute("type", "System.String")),
@@ -204,7 +203,7 @@ namespace Dasher.Schema.Generation.Tests
                                 new XAttribute("type", "System.Int32"),
                                 new XAttribute("default", "100"))
                                 );
-            var actual = XMLSchemaGenerator.GenerateSchema(typeof(UserScoreWithDefaultScore));
+            var actual = XMLSchemaGenerator.GenerateSchema(typeof(UserScoreWithDefaultScore), "Type");
             // Comparing XElements seems problematic, so bodge it by comparing
             // the string forms.
             Assert.Equal(expected.ToString(), actual.ToString());
@@ -214,13 +213,13 @@ namespace Dasher.Schema.Generation.Tests
         public void GenerateXMLSchemaForTypeContainingList()
         {
             /*
-            <Message name="UserScoreList">
+            <Type name="UserScoreList">
               <Field name="name" type="System.String" />
               <Field name="scores" type="System.Collections.Generic.IReadOnlyList`1[System.Int32]" />
-            </UserScoreList>
+            </Type>
             */
 
-            var expected = new XElement("Message", new XAttribute("name", "UserScoreList"),
+            var expected = new XElement("Type", new XAttribute("name", "UserScoreList"),
                 new XElement("Field",
                     new XAttribute("name", "name"),
                     new XAttribute("type", "System.String")),
@@ -229,7 +228,7 @@ namespace Dasher.Schema.Generation.Tests
                     new XAttribute("type", "System.Collections.Generic.IReadOnlyList`1[System.Int32]"))
                     );
 
-            var actual = XMLSchemaGenerator.GenerateSchema(typeof(UserScoreList));
+            var actual = XMLSchemaGenerator.GenerateSchema(typeof(UserScoreList), "Type");
             // Comparing XElements seems problematic, so bodge it by comparing
             // the string forms.
             Assert.Equal(expected.ToString(), actual.ToString());
@@ -239,7 +238,7 @@ namespace Dasher.Schema.Generation.Tests
         public void ThrowsOnNoPublicConstructors()
         {
             var ex = Assert.Throws<SchemaGenerationException>(
-                () => XMLSchemaGenerator.GenerateSchema(typeof(NoPublicConstructors)));
+                () => XMLSchemaGenerator.GenerateSchema(typeof(NoPublicConstructors), "Type"));
 
             Assert.Equal(typeof(NoPublicConstructors), ex.TargetType);
             Assert.Equal("Type must have a single public constructor.", ex.Message);
@@ -249,7 +248,7 @@ namespace Dasher.Schema.Generation.Tests
         public void ThrowsOnMultipleConstructors()
         {
             var ex = Assert.Throws<SchemaGenerationException>(
-                () => XMLSchemaGenerator.GenerateSchema(typeof(MultipleConstructors)));
+                () => XMLSchemaGenerator.GenerateSchema(typeof(MultipleConstructors), "Type"));
 
             Assert.Equal(typeof(MultipleConstructors), ex.TargetType);
             Assert.Equal("Type must have a single public constructor.", ex.Message);
@@ -259,29 +258,29 @@ namespace Dasher.Schema.Generation.Tests
         public void GenerateSchemaForTypeContainingComplexType()
         {
             /*
-<Message name="TestDefaultParams">
-  <Field name="sb" type="System.SByte" default="-12" />
-  <Field name="b" type="System.Byte" default="12" />
-  <Field name="s" type="System.Int16" default="-1234" />
-  <Field name="us" type="System.UInt16" default="1234" />
-  <Field name="i" type="System.Int32" default="-12345" />
-  <Field name="ui" type="System.UInt32" default="12345" />
-  <Field name="l" type="System.Int64" default="-12345678900" />
-  <Field name="ul" type="System.UInt64" default="12345678900" />
-  <Field name="str" type="System.String" default="str" />
-  <Field name="f" type="System.Single" default="1.23" />
-  <Field name="d" type="System.Double" default="1.23" />
-  <Field name="dc" type="System.Decimal" default="1.23" />
-  <Field name="e" type="Dasher.Schema.Generation.Tests.XMLSchemaGeneratorTests+TestEnum" default="Bar" />
-  <Field name="complex" type="Dasher.Schema.Generation.Tests.XMLSchemaGeneratorTests+UserScore" default="null">
-      <Field name="name" type="System.String" />
-      <Field name="score" type="System.Int32" />
-  </Field>
-  <Field name="bo" type="System.Boolean" default="true" />
-</TestDefaultParams>
+            <Type name="TestDefaultParams">
+              <Field name="sb" type="System.SByte" default="-12" />
+              <Field name="b" type="System.Byte" default="12" />
+              <Field name="s" type="System.Int16" default="-1234" />
+              <Field name="us" type="System.UInt16" default="1234" />
+              <Field name="i" type="System.Int32" default="-12345" />
+              <Field name="ui" type="System.UInt32" default="12345" />
+              <Field name="l" type="System.Int64" default="-12345678900" />
+              <Field name="ul" type="System.UInt64" default="12345678900" />
+              <Field name="str" type="System.String" default="str" />
+              <Field name="f" type="System.Single" default="1.23" />
+              <Field name="d" type="System.Double" default="1.23" />
+              <Field name="dc" type="System.Decimal" default="1.23" />
+              <Field name="e" type="Dasher.Schema.Generation.Tests.XMLSchemaGeneratorTests+TestEnum" default="Bar" />
+              <Field name="complex" type="Dasher.Schema.Generation.Tests.XMLSchemaGeneratorTests+UserScore" default="null">
+                  <Field name="name" type="System.String" />
+                  <Field name="score" type="System.Int32" />
+              </Field>
+              <Field name="bo" type="System.Boolean" default="true" />
+            </Type>
             */
 
-            var expected = new XElement("Message", new XAttribute("name", "TestDefaultParams"),
+            var expected = new XElement("Type", new XAttribute("name", "TestDefaultParams"),
                             new XElement("Field",
                                 new XAttribute("name", "sb"),
                                 new XAttribute("type", "System.SByte"),
@@ -350,7 +349,7 @@ namespace Dasher.Schema.Generation.Tests
                                 new XAttribute("type", "System.Boolean"),
                                 new XAttribute("default", "true"))
                                 );
-            var actual = XMLSchemaGenerator.GenerateSchema(typeof(TestDefaultParams));
+            var actual = XMLSchemaGenerator.GenerateSchema(typeof(TestDefaultParams), "Type");
             // Comparing XElements seems problematic, so bodge it by comparing
             // the string forms.
             Assert.Equal(expected.ToString(), actual.ToString());

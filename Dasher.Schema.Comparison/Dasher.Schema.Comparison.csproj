@@ -49,9 +49,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FieldDifference.cs" />
-    <Compile Include="Message.cs" />
+    <Compile Include="Serializable.cs" />
     <Compile Include="Field.cs" />
-    <Compile Include="MessageComparisonException.cs" />
+    <Compile Include="ComparisonException.cs" />
+    <Compile Include="Parser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

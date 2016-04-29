@@ -31,34 +31,40 @@ namespace Dasher.Schema.Comparison
             EXIT_ERROR = 1
         };
 
-        private string manifestPath = null;
-        private string otherManifestsDir = null;
-        private string manifestFileGlob = null;
-        private bool debug = false;
-        private bool help = false;
+        private string _manifestPath;
+        private string _otherManifestsDir;
+        private string _manifestFileGlob;
+        private string _serialisableTypeElementTag;
+        private string _serialisableTypesSectionTag;
+        private string _deserialisableTypesSectionTag;
+        private bool _debug;
+        private bool _help;
 
         private ReturnCode CompareSchema(string[] args)
         {
-            var optionSet = new OptionSet() {
-                                { "manifestPath=", o => manifestPath = o },
-                                { "otherManifestsDir=",  o => otherManifestsDir = o },
-                                { "manifestFileGlob=",  o => manifestFileGlob = o },
-                                { "debug",   v => debug = v != null },
-                                { "h|?|help",   v => help = v != null },
+            var optionSet = new OptionSet {
+                                { "manifestPath=", o => _manifestPath = o },
+                                { "otherManifestsDir=",  o => _otherManifestsDir = o },
+                                { "manifestFileGlob=",  o => _manifestFileGlob = o },
+                                { "typeElementTag=",  o => _serialisableTypeElementTag = o },
+                                { "serialisableTypesTag=",  o => _serialisableTypesSectionTag = o },
+                                { "deserialisableTypesTag=",  o => _deserialisableTypesSectionTag = o },
+                                { "debug",   v => _debug = v != null },
+                                { "h|?|help",   v => _help = v != null },
                                 };
+            optionSet.Parse(args);
 
-            List<string> extra = optionSet.Parse(args);
-
-            if (help)
+            if (_help)
             {
                 Usage();
                 return ReturnCode.EXIT_SUCCESS;
             }
 
-            if (debug)
+            if (_debug)
                 Debugger.Launch();
 
-            if (manifestPath == null || otherManifestsDir == null || manifestFileGlob == null)
+            if (_manifestPath == null || _otherManifestsDir == null || _manifestFileGlob == null ||
+                _serialisableTypeElementTag == null || _serialisableTypesSectionTag == null || _deserialisableTypesSectionTag == null)
             {
                 // This format makes it show up properly in the VS Error window.
                 Console.WriteLine("Dasher.Schema.Comparison.exe : error: Incorrect command line arguments.");
@@ -69,73 +75,62 @@ namespace Dasher.Schema.Comparison
             /*
             ** Algorithm is:
             ** Read file
-            ** For each message in this manifest
-            **     Next message if other manifest does not have message with same name
-            **     Foreach message in this manifest, find a message in the other manifest with the same name
-            *      Compare the messages.
+            ** For each type element in this manifest
+            **     Next type if other manifest does not have type with same name
+            **     Foreach type in this manifest, find a type in the other manifest with the same name
+            *      Compare the types.
             */
-            var thisManifest = XDocument.Load(manifestPath);
-            var theseReceivesMessageElements = thisManifest.XPathSelectElements("//ReceivesMessages/Message");
-            var theseReceivesMessages = new List<Message>();
-            foreach (var elem in theseReceivesMessageElements)
-            {
-                theseReceivesMessages.Add(Message.ParseFrom(elem));
-            }
-            var theseSendsMessageElements = thisManifest.XPathSelectElements("//SendsMessages/Message");
-            var theseSendsMessages = new List<Message>();
-            foreach (var elem in theseSendsMessageElements)
-            {
-                theseSendsMessages.Add(Message.ParseFrom(elem));
-            }
+            var parser = new Parser(_serialisableTypeElementTag);
+            var thisManifest = XDocument.Load(_manifestPath);
+            var theseDeserialisesTypeElements = thisManifest.XPathSelectElements($"//{_deserialisableTypesSectionTag}/{_serialisableTypeElementTag}");
+            var theseDeserialisesTypes = theseDeserialisesTypeElements.Select(elem => parser.ParseFrom(elem)).ToList();
+            var theseSerialisesTypeElements = thisManifest.XPathSelectElements($"//{_serialisableTypesSectionTag}/{_serialisableTypeElementTag}");
+            var theseSerialisesTypes = theseSerialisesTypeElements.Select(elem => parser.ParseFrom(elem)).ToList();
 
-            var otherManifestPaths = Directory.GetFiles(otherManifestsDir, manifestFileGlob, SearchOption.AllDirectories);
-            var foundError = false;
+            var otherManifestPaths = Directory.GetFiles(_otherManifestsDir, _manifestFileGlob, SearchOption.AllDirectories);
             foreach (var otherManifestPath in otherManifestPaths)
             {
                 var differences = new List<FieldDifference>();
                 var otherManifest = XDocument.Load(otherManifestPath);
 
-                // First look where we are the receiver and the other apps are the senders
-                var thoseSendsMessageElems = otherManifest.XPathSelectElements("//SendsMessages/Message");
-                var thoseSendsMessages = new List<Message>();
-                foreach (var elem in thoseSendsMessageElems)
+                // First look where we are the deserialiser and the other apps are the serialisers
+                var thoseSerialisesTypesElems = otherManifest.XPathSelectElements($"//{_serialisableTypesSectionTag}/{_serialisableTypeElementTag}");
+                var thoseSerialisesTypes = thoseSerialisesTypesElems.Select(elem => parser.ParseFrom(elem)).ToList();
+                foreach (var thisDeserialisesType in theseDeserialisesTypes)
                 {
-                    thoseSendsMessages.Add(Message.ParseFrom(elem));
-                }
-                foreach (var thisReceivesMessage in theseReceivesMessages)
-                {
-                    var otherSendMessages = (from m in thoseSendsMessages
-                                         where m.Name.ToLower() == thisReceivesMessage.Name.ToLower()
-                                         select m).ToList();
-                    if (otherSendMessages.Count == 0) // No message with same name in other manifest
+                    var otherSerialisesTypes =
+                        (from m in thoseSerialisesTypes
+                            where m.Name.ToLower() == thisDeserialisesType.Name.ToLower()
+                            select m).ToList();
+                    if (otherSerialisesTypes.Count == 0) // No type with same name in other manifest
                         continue;
-                    if (otherSendMessages.Count > 1)
+                    if (otherSerialisesTypes.Count > 1)
                     {
-                        Console.WriteLine($"{otherManifestPath}({thisReceivesMessage.Name}) : warning: {otherManifestPath} contains more than one message named {thisReceivesMessage.Name} in the SendsMessages section.  Only the first definition will be compared.");
+                        Console.WriteLine(
+                            $"{otherManifestPath}({thisDeserialisesType.Name}) : warning: {otherManifestPath} contains more than one type named " + 
+                            $"{thisDeserialisesType.Name} in the {_serialisableTypesSectionTag} section.  Only the first definition will be compared.");
                     }
-                    var otherSendsMessage = otherSendMessages.First();
-                    differences.AddRange(otherSendsMessage.CompareTo(thisReceivesMessage).ToList());
+                    var otherSerialisesType = otherSerialisesTypes.First();
+                    differences.AddRange(otherSerialisesType.CompareTo(thisDeserialisesType).ToList());
                 }
-                // Now where we are the sender and the other app are the receivers
-                var thoseReceivesMessageElems = otherManifest.XPathSelectElements("//ReceivesMessages/Message");
-                var thoseReceivesMessages = new List<Message>();
-                foreach (var elem in thoseReceivesMessageElems)
+                // Now where we are the serialiser and the other app is the deserialiser
+                var thoseDeserialisesTypeElements = otherManifest.XPathSelectElements($"//{_deserialisableTypesSectionTag}/{_serialisableTypeElementTag}");
+                var thoseDeserialisesTypes = thoseDeserialisesTypeElements.Select(elem => parser.ParseFrom(elem)).ToList();
+                foreach (var thisSerialisesType in theseSerialisesTypes)
                 {
-                    thoseReceivesMessages.Add(Message.ParseFrom(elem));
-                }
-                foreach (var thisSendsMessage in theseSendsMessages)
-                {
-                    var otherReceivesMessages = (from m in thoseReceivesMessages
-                                             where m.Name.ToLower() == thisSendsMessage.Name.ToLower()
+                    var otherDeserialisesTypes = (from m in thoseDeserialisesTypes
+                                             where m.Name.ToLower() == thisSerialisesType.Name.ToLower()
                                              select m).ToList();
-                    if (otherReceivesMessages.Count == 0) // No message with same name in other manifest
+                    if (otherDeserialisesTypes.Count == 0) // No type with same name in other manifest
                         continue;
-                    if (otherReceivesMessages.Count > 1)
+                    if (otherDeserialisesTypes.Count > 1)
                     {
-                        Console.WriteLine($"{otherManifestPath}({thisSendsMessage.Name}) : warning: {otherManifestPath} contains more than one message named {thisSendsMessage.Name} in the ReceivesMessages section.  Only the first definition will be compared.");
+                        Console.WriteLine(
+                            $"{otherManifestPath}({thisSerialisesType.Name}) : warning: {otherManifestPath} contains more than one type named " +
+                            $"{thisSerialisesType.Name} in the {_deserialisableTypesSectionTag} section.  Only the first definition will be compared.");
                     }
-                    var otherReceivesMessage = otherReceivesMessages.First();
-                    differences.AddRange(thisSendsMessage.CompareTo(otherReceivesMessage).ToList());
+                    var otherDeserialisesType = otherDeserialisesTypes.First();
+                    differences.AddRange(thisSerialisesType.CompareTo(otherDeserialisesType).ToList());
                 }
 
                 foreach (var difference in differences)
@@ -149,25 +144,31 @@ namespace Dasher.Schema.Comparison
                             Console.WriteLine($"{otherManifestPath}({difference.Field.Name}) : warning: {difference.Description}");
                             break;
                         default:
-                            throw new MessageComparisonException("Unknown difference level: " + difference.DifferenceLevel.ToString());
+                            throw new ComparisonException("Unknown difference level: " + difference.DifferenceLevel.ToString());
                     }
                 }
             }
 
-            if (foundError)
-                return ReturnCode.EXIT_ERROR;
-            else
-                return ReturnCode.EXIT_SUCCESS;
+            return ReturnCode.EXIT_SUCCESS;
         }
-
 
 
         private static void Usage()
         {
-            Console.WriteLine("Usage: Dasher.Schema.Comparison.exe --manifestPath=MANIFESTPATH --otherManifestsDir=OTHERMANIFESTSPATH --manifestFileGlob=MANIFESTFILEGLOB [--debug] [--help|-h|-?");
-            Console.WriteLine("MANIFESTPATH the path to the manifest to source the messages from.");
-            Console.WriteLine("OTHERMANIFESTSPATH is the top level directory, under which to search for other manifest files to compare messages.");
-            Console.WriteLine("MANIFESTFILEGLOB is the filename pattern to use to match manifest files.  Eg *.* will match all files, App.manifest will only consider files called App.manifest.");
+            Console.WriteLine("Usage:");
+            Console.WriteLine("    Dasher.Schema.Comparison.exe --manifestPath=MANIFESTPATH");
+            Console.WriteLine("        --otherManifestsDir=OTHERMANIFESTSPATH --manifestFileGlob=MANIFESTFILEGLOB");
+            Console.WriteLine("        --typeElementTag=TYPETAG");
+            Console.WriteLine("        --serialisableTypesTag=SERIALISABLESTAG --deserialisableTypesTag=DESERIALISABLESTAG");
+            Console.WriteLine("        [--debug] [--help|-h|-?");
+            Console.WriteLine("MANIFESTPATH the path to the manifest to source the types from.");
+            Console.WriteLine("OTHERMANIFESTSPATH is the top level directory, under which to search for other manifest files to compare types.");
+            Console.WriteLine(
+                "MANIFESTFILEGLOB is the filename pattern to use to match manifest files.  Eg *.* will match all files, App.manifest will only consider " +
+                "files called App.manifest.");
+            Console.WriteLine("TYPETAG is the XML tag for type entries (e.g., \"Message\").");
+            Console.WriteLine("SERIALISABLESTAG is the XML tag for the manifest sections listing serialisable types (e.g., \"SendsMessages\").");
+            Console.WriteLine("DESERIALISABLESTAG is the XML tag for the manifest sections listing deserialisable types (e.g., \"ReceivesMessages\").");
         }
     }
 }

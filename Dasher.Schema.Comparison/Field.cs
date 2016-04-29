@@ -1,27 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Dasher.Schema.Comparison
 {
     public class Field
     {
-        private Dictionary<string, Field> nameToField = new Dictionary<string, Field>();
+        private readonly Dictionary<string, Field> _nameToField = new Dictionary<string, Field>();
 
-        public Field(string name, string type, string defaultValue = null, IEnumerable<Field> subTypes = null)
+        private Field(string name, string type, string defaultValue = null, IEnumerable<Field> subTypes = null)
         {
             Name = name;
             Type = type;
             DefaultValue = defaultValue;
-            Fields = subTypes;
-            if (Fields == null)
-                Fields = new LinkedList<Field>();
+            Fields = subTypes ?? new LinkedList<Field>();
             foreach (var field in Fields)
             {
-                nameToField[field.Name.ToLower()] = field;
+                _nameToField[field.Name.ToLower()] = field;
             }
         }
 
@@ -36,41 +31,45 @@ namespace Dasher.Schema.Comparison
         public IEnumerable<Field> Fields { get; }
 
         /// <summary>
-        /// <see cref="Message.CompareTo(Message)"/>
-        /// 
+        /// <see cref="Serializable.CompareTo(Serializable)"/>
         /// </summary>
-        /// <param name="receiver"></param>
-        /// <returns></returns>
-        public IEnumerable<FieldDifference> CompareTo(Field receiver)
+        /// <param name="other"></param>
+        public IEnumerable<FieldDifference> CompareTo(Field other)
         {
             var differences = new List<FieldDifference>();
             // Warning if capitalisation is different
-            if (this.Name != receiver.Name)
+            if (Name != other.Name)
             {
-                differences.Add(new FieldDifference(this, "Fields have capitalisation difference: " +
-                    this.Name + " vs " + receiver.Name + ".",
-                    FieldDifference.DifferenceLevelEnum.Warning));
+                differences.Add(
+                    new FieldDifference(
+                        this,
+                        $"Fields have capitalisation difference: {Name} vs {other.Name}.",
+                        FieldDifference.DifferenceLevelEnum.Warning));
             }
             // Check types
-            if (this.Type != receiver.Type)
+            if (Type != other.Type)
             {
-                differences.Add(new FieldDifference(this, "Sender field " + this.Name
-                    + " has type " + this.Type + ", receiver field has type " + receiver.Type + ".",
-                    FieldDifference.DifferenceLevelEnum.Critical));
+                differences.Add(
+                    new FieldDifference(
+                        this,
+                        $"Serialisable field {Name} has type {Type}, deserialisable field has type {other.Type}.",
+                        FieldDifference.DifferenceLevelEnum.Critical));
             }
             // Check default values
-            if (this.DefaultValue != receiver.DefaultValue)
+            if (DefaultValue != other.DefaultValue)
             {
-                differences.Add(new FieldDifference(this, "Sender field " + this.Name +
-                    " has default value " + this.DefaultValue + ", receiver has default value " +
-                    receiver.DefaultValue + ".", FieldDifference.DifferenceLevelEnum.Warning));
+                differences.Add(
+                    new FieldDifference(
+                        this,
+                        $"Serialisable field {Name} has default value {DefaultValue}, deserialisable has default value {other.DefaultValue}.",
+                        FieldDifference.DifferenceLevelEnum.Warning));
             }
 
             // Check whether all fields in other exist in this
-            foreach (var otherField in receiver.Fields)
+            foreach (var otherField in other.Fields)
             {
                 Field thisField;
-                if (nameToField.TryGetValue(otherField.Name.ToLower(), out thisField))
+                if (_nameToField.TryGetValue(otherField.Name.ToLower(), out thisField))
                 {
                     differences.AddRange(thisField.CompareTo(otherField));
                 }
@@ -79,15 +78,19 @@ namespace Dasher.Schema.Comparison
                     // If there is a default value, then just a warning
                     if (otherField.DefaultValue != null)
                     {
-                        differences.Add(new FieldDifference(otherField, "Sender does not contain a " +
-                            otherField.Name + " field, but receiver has a default value.",
-                        FieldDifference.DifferenceLevelEnum.Warning));
+                        differences.Add(
+                            new FieldDifference(
+                                otherField,
+                                $"Serialisable does not contain a {otherField.Name} field, but deserialisable has a default value.",
+                                FieldDifference.DifferenceLevelEnum.Warning));
                     }
                     else
                     {
-                        differences.Add(new FieldDifference(otherField, "Sender does not contain a " +
-                            otherField.Name + " field, and receiver has no default value.",
-                        FieldDifference.DifferenceLevelEnum.Critical));
+                        differences.Add(
+                            new FieldDifference(
+                                otherField,
+                                $"Serialisable does not contain a {otherField.Name} field, and deserialisable has no default value.",
+                                FieldDifference.DifferenceLevelEnum.Critical));
                     }
 
                 }
@@ -96,11 +99,14 @@ namespace Dasher.Schema.Comparison
             foreach (var thisField in Fields)
             {
                 Field otherField;
-                if (!receiver.nameToField.TryGetValue(thisField.Name.ToLower(), out otherField))
+                if (!other._nameToField.TryGetValue(thisField.Name.ToLower(), out otherField))
                 {
-                    differences.Add(new FieldDifference(thisField, "Sender contains a " +
-                            thisField.Name + " field, but receiver does not.  The receiver must use Dasher UnexpectedFieldBehaviour.Ignore mode.",
-                        FieldDifference.DifferenceLevelEnum.Warning));
+                    differences.Add(
+                        new FieldDifference(
+                            thisField,
+                            $"Serialisable contains a {thisField.Name} field, but deserialisable does not. Deserialisable must use Dasher " +
+                            "UnexpectedFieldBehaviour.Ignore mode.",
+                            FieldDifference.DifferenceLevelEnum.Warning));
                 }
             }
             return differences;
@@ -110,19 +116,19 @@ namespace Dasher.Schema.Comparison
         {
             if (xml.Name != "Field")
             {
-                throw new MessageComparisonException("Expected a Field element, got a " + xml.Name);
+                throw new ComparisonException($"Expected a Field element, got a {xml.Name}");
             }
             var name = xml.Attribute("name");
             if (name == null)
             {
-                throw new MessageComparisonException("Field element has no attribute \"name\"");
+                throw new ComparisonException("Field element has no attribute \"name\"");
             }
             var nameValue = name.Value;
 
             var type = xml.Attribute("type");
             if (type == null)
             {
-                throw new MessageComparisonException("Field element " + nameValue + " has no attribute \"type\"");
+                throw new ComparisonException($"Field element {nameValue} has no attribute \"type\"");
             }
             var typeValue = type.Value;
             // Strip off namespaces and containing types if not a system type

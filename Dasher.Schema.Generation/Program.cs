@@ -17,7 +17,7 @@ namespace Dasher.Schema.Generation
                     Environment.ExitCode = (int)retCode;
                     return;
                 }
-                new SchemaGenerator().GenerateSchema(appArguments);
+                SchemaGenerator.GenerateSchema(appArguments);
             }
             catch (SchemaGenerationException e)
             {
