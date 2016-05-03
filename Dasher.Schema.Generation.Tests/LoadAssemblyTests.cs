@@ -32,7 +32,7 @@ namespace Dasher.Schema.Generation.Tests
     public class LoadAssemblyTests
     {
         private readonly DasherAssemblyInfo _dasherAssemblyInfo;
-        private AssemblyWalkerProxy _assemblyWalkerProxy;
+        private readonly AssemblyWalkerProxy _assemblyWalkerProxy;
 
         public LoadAssemblyTests()
         {
@@ -43,37 +43,37 @@ namespace Dasher.Schema.Generation.Tests
         }
 
         [Fact]
-        public void LoadMessages()
+        public void LoadSerialisables()
         {
-            Assert.Equal(3, _dasherAssemblyInfo.ReceiveMessageTypes.Count);
-            Assert.Equal(4, _dasherAssemblyInfo.SendMessageTypes.Count);
+            Assert.Equal(3, _dasherAssemblyInfo.DeserialisableTypes.Count);
+            Assert.Equal(4, _dasherAssemblyInfo.SerialisableTypes.Count);
         }
 
 
         [Fact]
-        public void SendMessagesTest()
+        public void SerialiseTest()
         {
-            Assert.True(_dasherAssemblyInfo.SendMessageTypes.Any(o => o.Name == "Sender"));
-            Assert.True(_dasherAssemblyInfo.SendMessageTypes.Any(o => o.Name == "BaseSenderReceiver"));
-            Assert.True(_dasherAssemblyInfo.SendMessageTypes.Any(o => o.Name == "SenderAndReceiver"));
-            Assert.True(_dasherAssemblyInfo.SendMessageTypes.Any(o => o.Name == "DerivedSender"));
-            Assert.False(_dasherAssemblyInfo.SendMessageTypes.Any(o => o.Name == "Receiver"));
+            Assert.True(_dasherAssemblyInfo.SerialisableTypes.Any(o => o.Name == "DummySerialisable"));
+            Assert.True(_dasherAssemblyInfo.SerialisableTypes.Any(o => o.Name == "BaseSerialiseDeserialise"));
+            Assert.True(_dasherAssemblyInfo.SerialisableTypes.Any(o => o.Name == "DummySerialiseDeserialise"));
+            Assert.True(_dasherAssemblyInfo.SerialisableTypes.Any(o => o.Name == "DerivedSerialiseOnly"));
+            Assert.False(_dasherAssemblyInfo.SerialisableTypes.Any(o => o.Name == "DummyDeserialiseOnly"));
         }
 
         [Fact]
-        public void ReceiveMessagesTest()
+        public void DeserialiseTest()
         {
-            Assert.True(_dasherAssemblyInfo.ReceiveMessageTypes.Any(o => o.Name == "Receiver"));
-            Assert.True(_dasherAssemblyInfo.ReceiveMessageTypes.Any(o => o.Name == "BaseSenderReceiver"));
-            Assert.True(_dasherAssemblyInfo.ReceiveMessageTypes.Any(o => o.Name == "SenderAndReceiver"));
-            Assert.False(_dasherAssemblyInfo.ReceiveMessageTypes.Any(o => o.Name == "DerivedSender"));
-            Assert.False(_dasherAssemblyInfo.ReceiveMessageTypes.Any(o => o.Name == "Sender"));
+            Assert.True(_dasherAssemblyInfo.DeserialisableTypes.Any(o => o.Name == "DummyDeserialiseOnly"));
+            Assert.True(_dasherAssemblyInfo.DeserialisableTypes.Any(o => o.Name == "BaseSerialiseDeserialise"));
+            Assert.True(_dasherAssemblyInfo.DeserialisableTypes.Any(o => o.Name == "DummySerialiseDeserialise"));
+            Assert.False(_dasherAssemblyInfo.DeserialisableTypes.Any(o => o.Name == "DerivedSerialiseOnly"));
+            Assert.False(_dasherAssemblyInfo.DeserialisableTypes.Any(o => o.Name == "DummySerialisable"));
         }
         [Fact]
         public void BaseClassIgnoreTest()
         {
-            Assert.False(_dasherAssemblyInfo.ReceiveMessageTypes.Any(o => o.Name == "DerivedSender"));
-            Assert.True(_dasherAssemblyInfo.SendMessageTypes.Any(o => o.Name == "DerivedSender"));
+            Assert.False(_dasherAssemblyInfo.DeserialisableTypes.Any(o => o.Name == "DerivedSerialiseOnly"));
+            Assert.True(_dasherAssemblyInfo.SerialisableTypes.Any(o => o.Name == "DerivedSerialiseOnly"));
         }
 
         [Fact]

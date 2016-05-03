@@ -7,8 +7,8 @@ namespace Dasher.Schema.Comparison.Tests
     public class SchemaComparisonTests
     {
         #region Test types
-        private XElement simpleMessage =
-                        new XElement("Message", new XAttribute("name", "UserScore"),
+        private readonly XElement _simpleObject =
+                        new XElement("Type", new XAttribute("name", "UserScore"),
                             new XElement("Field",
                                 new XAttribute("name", "Score"),
                                 new XAttribute("type", "System.Int32")),
@@ -17,8 +17,8 @@ namespace Dasher.Schema.Comparison.Tests
                                 new XAttribute("type", "System.String"))
                                 );
         // field order reversed, field names different case (will give warning)
-        private XElement compatibleSimpleMessage =
-                        new XElement("Message", new XAttribute("name", "UserScore"),
+        private readonly XElement _compatibleSimpleObject =
+                        new XElement("Type", new XAttribute("name", "UserScore"),
                             new XElement("Field",
                                 new XAttribute("name", "naMe"),
                                 new XAttribute("type", "System.String")),
@@ -27,8 +27,8 @@ namespace Dasher.Schema.Comparison.Tests
                                 new XAttribute("type", "System.Int32"))
                                 );
 
-        private XElement messageWithEnum =
-                new XElement("Message", new XAttribute("name", "UserScore"),
+        private readonly XElement _objectWithEnum =
+                new XElement("Type", new XAttribute("name", "UserScore"),
                     new XElement("Field",
                         new XAttribute("name", "Score"),
                         new XAttribute("type", "System.Int32")),
@@ -37,8 +37,8 @@ namespace Dasher.Schema.Comparison.Tests
                         new XAttribute("type", "Dasher.SchemaComparison.Tests.XMLSchemaGeneratorTests+TestEnum"))
                         );
 
-        private XElement messageWithNestedComplexTypesAndEnum =
-                        new XElement("Message", new XAttribute("name", "TypeWithComplexType"),
+        private readonly XElement _objectWithNestedComplexTypesAndEnum =
+                        new XElement("Type", new XAttribute("name", "TypeWithComplexType"),
                             new XElement("Field",
                                 new XAttribute("name", "Enum"),
                                 new XAttribute("type", "Dasher.SchemaComparison.Tests.XMLSchemaGeneratorTests+TestEnum"),
@@ -74,8 +74,8 @@ namespace Dasher.Schema.Comparison.Tests
                                 new XAttribute("default", "true"))
                                 );
 
-        private XElement incompatibleMessageWithNestedComplexTypesAndEnum =
-                        new XElement("Message", new XAttribute("name", "TypeWithComplexType"),
+        private readonly XElement _incompatibleObjectWithNestedComplexTypesAndEnum =
+                        new XElement("Type", new XAttribute("name", "TypeWithComplexType"),
                             new XElement("Field",
                                 new XAttribute("name", "Enum"),
                                 new XAttribute("type", "Dasher.SchemaComparison.Tests.XMLSchemaGeneratorTests+TestEnum"),
@@ -122,7 +122,8 @@ namespace Dasher.Schema.Comparison.Tests
         [Fact]
         public void ParseSimpleType()
         {
-            var actual = Message.ParseFrom(simpleMessage);
+            var parser = new Parser("Type");
+            var actual = parser.ParseFrom(_simpleObject);
 
             Assert.Equal("UserScore", actual.Name);
             var fields = actual.Fields.ToArray();
@@ -139,7 +140,8 @@ namespace Dasher.Schema.Comparison.Tests
         [Fact]
         public void ParseTypeWithEnum()
         {
-            var actual = Message.ParseFrom(messageWithEnum);
+            var parser = new Parser("Type");
+            var actual = parser.ParseFrom(_objectWithEnum);
 
             Assert.Equal("UserScore", actual.Name);
             var fields = actual.Fields.ToArray();
@@ -156,7 +158,8 @@ namespace Dasher.Schema.Comparison.Tests
         [Fact]
         public void ParseTypeWithNestedComplexTypeAndEnum()
         {
-            var actual = Message.ParseFrom(messageWithNestedComplexTypesAndEnum);
+            var parser = new Parser("Type");
+            var actual = parser.ParseFrom(_objectWithNestedComplexTypesAndEnum);
 
             Assert.Equal("TypeWithComplexType", actual.Name);
             var fields = actual.Fields.ToArray();
@@ -190,12 +193,13 @@ namespace Dasher.Schema.Comparison.Tests
         }
 
         [Fact]
-        public void ComparesSimpleMessageThatIsCompatible()
+        public void ComparesSimpleObjectThatIsCompatible()
         {
-            var thisMessage = Message.ParseFrom(simpleMessage);
-            var thatMessage = Message.ParseFrom(compatibleSimpleMessage);
+            var parser = new Parser("Type");
+            var thisObject = parser.ParseFrom(_simpleObject);
+            var thatObject = parser.ParseFrom(_compatibleSimpleObject);
 
-            var differences = thisMessage.CompareTo(thatMessage).ToArray();
+            var differences = thisObject.CompareTo(thatObject).ToArray();
             Assert.Equal(2, differences.ToArray().Length);
 
             Assert.Equal("Fields have capitalisation difference: Name vs naMe.", differences[0].Description);
@@ -210,15 +214,16 @@ namespace Dasher.Schema.Comparison.Tests
         [Fact]
         public void FindsAllDifferences()
         {
-            var thisMessage = Message.ParseFrom(messageWithNestedComplexTypesAndEnum);
+            var parser = new Parser("Type");
+            var thisSerialisable = parser.ParseFrom(_objectWithNestedComplexTypesAndEnum);
             // See comments above pointing out differences
-            var thatMessage = Message.ParseFrom(incompatibleMessageWithNestedComplexTypesAndEnum);
+            var thatSerialisable = parser.ParseFrom(_incompatibleObjectWithNestedComplexTypesAndEnum);
 
-            var differences = thisMessage.CompareTo(thatMessage).ToArray();
+            var differences = thisSerialisable.CompareTo(thatSerialisable).ToArray();
 
             Assert.Equal(6, differences.Length);
 
-            Assert.Equal("Sender does not contain a ExtraFieldWithNoDefault field, and receiver has no default value.", differences[0].Description);
+            Assert.Equal("Serialisable does not contain a ExtraFieldWithNoDefault field, and deserialisable has no default value.", differences[0].Description);
             Assert.Equal("ExtraFieldWithNoDefault", differences[0].Field.Name);
             Assert.Equal(FieldDifference.DifferenceLevelEnum.Critical, differences[0].DifferenceLevel);
 
@@ -226,19 +231,19 @@ namespace Dasher.Schema.Comparison.Tests
             Assert.Equal("XYZ", differences[1].Field.Name);
             Assert.Equal(FieldDifference.DifferenceLevelEnum.Warning, differences[1].DifferenceLevel);
 
-            Assert.Equal("Sender does not contain a ExtraSubFieldWithNoDefault field, and receiver has no default value.", differences[2].Description);
+            Assert.Equal("Serialisable does not contain a ExtraSubFieldWithNoDefault field, and deserialisable has no default value.", differences[2].Description);
             Assert.Equal("ExtraSubFieldWithNoDefault", differences[2].Field.Name);
             Assert.Equal(FieldDifference.DifferenceLevelEnum.Critical, differences[2].DifferenceLevel);
 
-            Assert.Equal("Sender field ABC has type System.Int32, receiver field has type System.Int64.", differences[3].Description);
+            Assert.Equal("Serialisable field ABC has type System.Int32, deserialisable field has type System.Int64.", differences[3].Description);
             Assert.Equal("ABC", differences[3].Field.Name);
             Assert.Equal(FieldDifference.DifferenceLevelEnum.Critical, differences[3].DifferenceLevel);
 
-            Assert.Equal("Sender does not contain a subXYZWithDefault field, but receiver has a default value.", differences[4].Description);
+            Assert.Equal("Serialisable does not contain a subXYZWithDefault field, but deserialisable has a default value.", differences[4].Description);
             Assert.Equal("subXYZWithDefault", differences[4].Field.Name);
             Assert.Equal(FieldDifference.DifferenceLevelEnum.Warning, differences[4].DifferenceLevel);
 
-            Assert.Equal("Sender contains a ExtraBool field, but receiver does not.  The receiver must use Dasher UnexpectedFieldBehaviour.Ignore mode.",
+            Assert.Equal("Serialisable contains a ExtraBool field, but deserialisable does not. Deserialisable must use Dasher UnexpectedFieldBehaviour.Ignore mode.",
                 differences[5].Description);
             Assert.Equal("ExtraBool", differences[5].Field.Name);
             Assert.Equal(FieldDifference.DifferenceLevelEnum.Warning, differences[5].DifferenceLevel);

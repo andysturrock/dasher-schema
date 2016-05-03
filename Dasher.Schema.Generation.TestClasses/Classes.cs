@@ -6,33 +6,31 @@ using System.Threading.Tasks;
 
 namespace Dasher.Schema.Generation.TestClasses
 {
-    [SendMessage]
-    public class Sender
+    [DasherSerialisable(SupportedOperations.SerialiseOnly)]
+    public class DummySerialisable
     {
     }
 
-    [ReceiveMessage]
-    public class Receiver
-    {
-        
-    }
-
-    [SendMessage]
-    [ReceiveMessage]
-    public class SenderAndReceiver
+    [DasherSerialisable(SupportedOperations.DeserialiseOnly)]
+    public class DummyDeserialiseOnly
     {
         
     }
 
-    [SendMessage]
-    [ReceiveMessage]
-    public class BaseSenderReceiver
+    [DasherSerialisable(SupportedOperations.SerialiseDeserialise)]
+    public class DummySerialiseDeserialise
     {
         
     }
 
-    [SendMessage]
-    public class DerivedSender : BaseSenderReceiver
+    [DasherSerialisable(SupportedOperations.SerialiseDeserialise)]
+    public class BaseSerialiseDeserialise
+    {
+        
+    }
+
+    [DasherSerialisable(SupportedOperations.SerialiseOnly)]
+    public class DerivedSerialiseOnly : BaseSerialiseDeserialise
     {
         
     }

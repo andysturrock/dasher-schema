@@ -2,22 +2,20 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/km8g7viqsq0lg2rx?svg=true)](https://ci.appveyor.com/project/andysturrock/dasher-schema)
 
-[Dasher](https://github.com/drewnoakes/dasher) provides a way to deal at runtime with messages that mismatch in structure.  This project provides a build-time mechanism for generating explicit externalised schemas for the messages and also checking message compatibility.
+[Dasher](https://github.com/drewnoakes/dasher) tolerates some degree of mismatch in structure between types when they are deserialised, relative to the structure of the type that was used for serialisation. This repository provides build-time tooling to generate explicit externalised schemas (in XML) for your serialisable types and to check that Dasher's compatibility rules have been adhered to.
 
 ## Dasher.Schema
 [![NuGet version](https://img.shields.io/nuget/v/Dasher.Schema.svg)](https://www.nuget.org/packages/Dasher.Schema)
 [![download stats](https://img.shields.io/nuget/dt/Dasher.Schema.svg)](https://www.nuget.org/packages/Dasher.Schema)
-This project provides attributes/annotations for classes that you want to send or receive using [Dasher](https://github.com/drewnoakes/dasher).
-The schema generation project below can then use those annotations to generate an explicit schema for your messages.
-It also provides Serialiser and Deserialiser classes which check (on construction) that their generic type arguments are annotated
-with `[SendMessage]` or `[ReceiveMessage]` respectively.
+This library assembly provides attribute annotations for classes that you will serialise or deserialise using [Dasher](https://github.com/drewnoakes/dasher).
+The schema generation tool (see below) can then use those annotations to generate an explicit schema for your serialisable types.
+It also provides `Serialiser` and `Deserialiser` wrapper classes which check (on construction via their `GetSerialiser` and `GetDeserialiser` factory methods) that their generic type arguments are annotated with the `[DasherSerialisable]` attribute parameterised with the correct `usage` mode (`SerialiseOnly`, `DeserialiseOnly` or `SerialiseDeserialise`, as appropriate).
 
-Annotate your classes that you want to generate a schema for like this:
+Annotate types that you wish to mark for inclusion in the schema as follows:
 ```csharp
 using Dasher.Schema;
 
-[ReceiveMessage]
-[SendMessage]
+[DasherSerialisable(SupportedOperations.SerialiseDeserialise, "Optional description of this type")]
 public sealed class UserScoreWithDefaultScore
 {
     public UserScoreWithDefaultScore(string name, int score = 100)
@@ -31,22 +29,23 @@ public sealed class UserScoreWithDefaultScore
 }
 ```
 
+The optional description will be put into the schema if provided, but is not used otherwise by the tooling in this repository.
+
 ## Dasher.Schema.Generation
 [![NuGet version](https://img.shields.io/nuget/v/Dasher.Schema.Generation.svg)](https://www.nuget.org/packages/Dasher.Schema.Generation)
 [![download stats](https://img.shields.io/nuget/dt/Dasher.Schema.Generation.svg)](https://www.nuget.org/packages/Dasher.Schema.Generation)
 
-This project uses the annotations above to generate an explicit schema file.
+This tool uses the annotations above to generate an explicit schema file.
 
-On a rebuild of the project a file called App.manifest will be created in the project directory and also the output directory.
+On a rebuild of the project an XML file will be created or updated in the project directory and also the output directory.
 
-Add the following incantation to the Post-build event command line (right-click the project->Properties->Build Events tab):
-`PATH TO EXE\Dasher.Schema.Generation --targetDir=$(TargetDir) --targetPath=$(TargetPath) --projectDir=$(ProjectDir)`
+To make use of this, add the following step to the Post-build Event Command Line in your Visual Studio project (right-click the project then choose Properties, then go to the Build Events tab):
 
-If you have installed using [NuGet](https://www.nuget.org/packages/Dasher.Schema.Generation) from Nuget Gallery the incantation will be:
-`$(SolutionDir)\packages\Dasher.Schema.Generation.VERSION\tools\Dasher.Schema.Generation --targetDir=$(TargetDir) --targetPath=$(TargetPath) --projectDir=$(ProjectDir)`
-Make sure VERSION is pointing to the latest version.  You can see what that is from the badge above.
+`PATH-TO-EXE\Dasher.Schema.Generation --targetDir="$(TargetDir)\" --targetPath="$(TargetPath)" --projectDir="$(ProjectDir)\" --outputFileName="App.manifest" --rootElementTag=App --typeElementTag="Message" --serialisableTypesTag="SendsMessages" --deserialisableTypesTag="ReceivesMessages"`
 
-The App.manifest will look something like this:
+If you have installed using [NuGet](https://www.nuget.org/packages/Dasher.Schema.Generation) from Nuget Gallery then `PATH-TO-EXE` will be `$(SolutionDir)\packages\Dasher.Schema.Generation.VERSION\tools` where `VERSION` is the version you have installed (hopefully being the latest). You can check that from the badge above.
+
+The parameters shown will lead to the manifest being called `App.manifest` and having contents similar to this:
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <App>
@@ -65,21 +64,21 @@ The App.manifest will look something like this:
 </App>
 ```
 
+(Note that the XML element names for the document root, the two sections below that which hold the type entries and the individual entries themselves are specified by command parameters, but the overall structure is fixed.)
+
 ## Dasher.Schema.Comparison
 [![NuGet version](https://img.shields.io/nuget/v/Dasher.Schema.Comparison.svg)](https://www.nuget.org/packages/Dasher.Schema.Comparison)
 [![download stats](https://img.shields.io/nuget/dt/Dasher.Schema.Comparison.svg)](https://www.nuget.org/packages/Dasher.Schema.Comparison)
 
-This project compares Dasher.Schema.Generation files and determines message compatibility.
+This tool compares manifests generated by Dasher.Schema.Generation and checks for compatibility between serialisation and deserialisation.
 
-Add the following incantation to the Post-build event command line (right-click the project->Properties->Build Events tab):
-`PATH TO EXE\Dasher.Schema.Generation --targetDir=$(TargetDir) --targetPath=$(TargetPath) --projectDir=$(ProjectDir)`
+To use this tool, add the following step to the Post-build Event Command Line in your Visual Studio project (right-click the project then choose Properties, then go to the Build Events tab):
 
-If you have installed using [NuGet](https://www.nuget.org/packages/Dasher.Schema.Comparison) from Nuget Gallery the incantation will be:
-`$(SolutionDir)\packages\Dasher.Schema.Comparison.VERSION\tools\Dasher.Schema.Comparison --manifestPath=$(ProjectDir)\App.manifest --otherManifestsDir=OTHERMANIFESTSPATH --manifestFileGlob=MANIFESTFILEGLOB`
+`PATH-TO-EXE\Dasher.Schema.Comparison --manifestPath="$(ProjectDir)\App.manifest" --otherManifestsDir="%TEMP%\manifests" --manifestFileGlob=*.manifest --typeElementTag="Message" --serialisableTypesTag="SendsMessages" --deserialisableTypesTag="ReceivesMessages"`
 
-Make sure VERSION is pointing to the latest version.  You can see what that is from the badge above.
-Set OTHERMANIFESTSPATH to where all your other manifests are stored.  This directory is searched recursively.
-Set MANIFESTFILEGLOB to a glob that will match the files, eg \*.\* to match everything, App.manifest to only match files called App.manifest.
+If you have installed using [NuGet](https://www.nuget.org/packages/Dasher.Schema.Comparison) from Nuget Gallery then `PATH-TO-EXE` will be `$(SolutionDir)\packages\Dasher.Schema.Comparison.VERSION\tools` where `VERSION` is the version you have installed (hopefully being the latest). You can check that from the badge above.
+
+Set `otherManifestsDir` to where all your other manifests are stored. This directory is searched recursively. Set `manifestFileGlob` to a glob that will match the files, e.g., `"\*.\*"` to match everything, `App.manifest` to only match files called App.manifest. The remaining parameters specify the XML tag names that will be used when reading the manifest, and should match the ones used for generation.
 
 
 ## License

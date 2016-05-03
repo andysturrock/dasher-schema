@@ -5,20 +5,20 @@ using System.Xml.Linq;
 
 namespace Dasher.Schema.Generation
 {
-    public class XMLSchemaGenerator
+    public static class XMLSchemaGenerator
     {
-        public static XElement GenerateSchema(Type type)
+        public static XElement GenerateSchema(Type type, string serialisableTypeElementTag)
         {
             var desc = GetDescription(type);
-            var message = new XElement("Message", new XAttribute("name", type.Name), desc != null ? new XAttribute("description", desc) : null);
-            GenerateSchema(type, message);
-            return message;
+            var element = new XElement(serialisableTypeElementTag, new XAttribute("name", type.Name), desc != null ? new XAttribute("description", desc) : null);
+            GenerateSchema(type, element);
+            return element;
         }
 
         private static string GetDescription(Type type)
         {
-             var atrs = type.GetCustomAttributes(typeof(SynergyMessageBaseAttribute));
-             var atr = (SynergyMessageBaseAttribute) atrs.FirstOrDefault();
+             var atrs = type.GetCustomAttributes(typeof(DasherSerialisableAttribute));
+             var atr = (DasherSerialisableAttribute) atrs.FirstOrDefault();
              return atr?.Description;
         }
 
@@ -40,7 +40,7 @@ namespace Dasher.Schema.Generation
                                 new XAttribute("type", ctorArg.ParameterType));
                     if (ctorArg.HasDefaultValue)
                     {
-                        fieldElem.Add(new XAttribute("default", ctorArg.DefaultValue == null ? "null" : ctorArg.DefaultValue));
+                        fieldElem.Add(new XAttribute("default", ctorArg.DefaultValue ?? "null"));
                     }
                     parentField.Add(fieldElem);
                 }
@@ -51,7 +51,7 @@ namespace Dasher.Schema.Generation
                                 new XAttribute("type", ctorArg.ParameterType));
                     if (ctorArg.HasDefaultValue)
                     {
-                        fieldElem.Add(new XAttribute("default", ctorArg.DefaultValue == null ? "null" : ctorArg.DefaultValue));
+                        fieldElem.Add(new XAttribute("default", ctorArg.DefaultValue ?? "null"));
                     }
                     GenerateSchema(ctorArg.ParameterType, fieldElem);
                     parentField.Add(fieldElem);

@@ -9,9 +9,9 @@
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <projectUrl>https://github.com/andysturrock/dasher-schema</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <summary>Annotations for Dasher messages.</summary>
+    <summary>Annotations for defining objects to be serialised/deserialised using Dasher.</summary>
     <description>
-      Annotations for Dasher messages.
+      Annotations for defining objects to be serialised/deserialised using Dasher, with validation and other schema tooling support.
     </description>
     <!--<releaseNotes>Summary of changes made in this release of the package.</releaseNotes>-->
     <copyright>Copyright Andy Sturrock 2015</copyright>

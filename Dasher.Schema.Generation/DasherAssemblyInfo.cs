@@ -7,11 +7,11 @@ namespace Dasher.Schema.Generation
     {
         public DasherAssemblyInfo()
         {
-            SendMessageTypes = new HashSet<Type>();
-            ReceiveMessageTypes = new HashSet<Type>();
+            SerialisableTypes = new HashSet<Type>();
+            DeserialisableTypes = new HashSet<Type>();
         }
 
-        public HashSet<Type> SendMessageTypes { get; }
-        public HashSet<Type> ReceiveMessageTypes { get; }
+        public HashSet<Type> SerialisableTypes { get; }
+        public HashSet<Type> DeserialisableTypes { get; }
     }
 }

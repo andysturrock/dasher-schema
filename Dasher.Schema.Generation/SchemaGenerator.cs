@@ -10,75 +10,75 @@ namespace Dasher.Schema.Generation
         EXIT_SUCCESS = 0,
         EXIT_ERROR = 1
     };
-    public class SchemaGenerator
+    public static class SchemaGenerator
     {
-        private const string SENDS_MESSAGES_ELEMENT = "SendsMessages";
-        private const string RECEIVE_MESSAGES_ELEMENT = "ReceivesMessages";
-        private const string APP_ELEMENT = "App";
-
-        public void GenerateSchema(AppArguments args)
+        public static void GenerateSchema(AppArguments args)
         {
             var assembly = Assembly.LoadFrom(args.TargetPath);
-            var aw = new AssemblyWalker(args.IncludedDependencies, args.ExcludedDependencies);
-            var assemblyInfo = aw.GetDasherAssemblyInfo(assembly);
+            var walker = new AssemblyWalker(args.IncludedDependencies, args.ExcludedDependencies);
+            var assemblyInfo = walker.GetDasherAssemblyInfo(assembly);
 
-            // Write to the project (ie source) dir and also the target (ie bin) dir.
-            // This ensures the manifest is checked into source control but is also
+            // Write to the project (ie source) dir and also the target (ie bin) dir. This ensures the manifest is checked into source control but is also
             // can be bundled with the application if needed.
-            WriteToAppManifest(args.TargetDir, assemblyInfo);
-            WriteToAppManifest(args.ProjectDir, assemblyInfo);
+            WriteToManifest(assemblyInfo,
+                args.TargetDir, args.OutputFileName, args.RootElementTag, args.SerialisableTypeElementTag,
+                args.SerialisableTypesSectionTag, args.DeserialisableTypesSectionTag);
+            WriteToManifest(assemblyInfo,
+                args.ProjectDir, args.OutputFileName, args.RootElementTag, args.SerialisableTypeElementTag,
+                args.SerialisableTypesSectionTag, args.DeserialisableTypesSectionTag);
         }
 
-        private void WriteToAppManifest(string dirName, DasherAssemblyInfo result)
+        private static void WriteToManifest(
+            DasherAssemblyInfo dasherAssemblyInfo, string outputDirectoryName, string outputFileName, string rootElementTag, string serialisableTypeElementTag,
+            string serialisesTypesElementTag, string deserialisesTypesElementTag)
         {
             XDocument doc;
-            // Create a file with a root element if the manifest doesn't exist.
-            // This should only happen in testing.
-            string appManifestFileName = dirName + "App.manifest";
-            XElement appElement;
-            if (File.Exists(appManifestFileName))
+            // Create a file with a root element if the manifest doesn't exist. This should only happen in testing.
+            string manifestFileName = outputDirectoryName + outputFileName;
+            XElement rootElement;
+            if (File.Exists(manifestFileName))
             {
-                doc = XDocument.Load(appManifestFileName);
-                appElement = doc.Element(APP_ELEMENT);
-                if (appElement == null)
+                doc = XDocument.Load(manifestFileName);
+                rootElement = doc.Element(rootElementTag);
+                if (rootElement == null)
                 {
-                    appElement = new XElement(APP_ELEMENT);
-                    doc.AddFirst(appElement);
+                    rootElement = new XElement(rootElementTag);
+                    doc.AddFirst(rootElement);
                 }
-                if (appElement.Element(SENDS_MESSAGES_ELEMENT) == null)
+                if (rootElement.Element(serialisesTypesElementTag) == null)
                 {
-                    appElement.Add(new XElement(SENDS_MESSAGES_ELEMENT));
+                    rootElement.Add(new XElement(serialisesTypesElementTag));
                 }
-                if (appElement.Element(RECEIVE_MESSAGES_ELEMENT) == null)
+                if (rootElement.Element(deserialisesTypesElementTag) == null)
                 {
-                    appElement.Add(new XElement(RECEIVE_MESSAGES_ELEMENT));
+                    rootElement.Add(new XElement(deserialisesTypesElementTag));
                 }
             }
             else
             {
-                doc = new XDocument(new XElement(APP_ELEMENT));
-                appElement = doc.Element(APP_ELEMENT);
-                appElement.Add(new XElement(SENDS_MESSAGES_ELEMENT));
-                appElement.Add(new XElement(RECEIVE_MESSAGES_ELEMENT));
+                doc = new XDocument(new XElement(rootElementTag));
+                rootElement = doc.Element(rootElementTag);
+                rootElement.Add(new XElement(serialisesTypesElementTag));
+                rootElement.Add(new XElement(deserialisesTypesElementTag));
             }
 
-            var sendsMessagesElement = new XElement(SENDS_MESSAGES_ELEMENT);
-            var receivesMessagesElement = new XElement(RECEIVE_MESSAGES_ELEMENT);
-            foreach (var sendMessageType in result.SendMessageTypes)
+            var serialisesTypesElement = new XElement(serialisesTypesElementTag);
+            var deserialisesTypesElement = new XElement(deserialisesTypesElementTag);
+            foreach (var serialisableType in dasherAssemblyInfo.SerialisableTypes)
             {
-                var message = XMLSchemaGenerator.GenerateSchema(sendMessageType);
-                sendsMessagesElement.AddFirst(message);
+                var element = XMLSchemaGenerator.GenerateSchema(serialisableType, serialisableTypeElementTag);
+                serialisesTypesElement.AddFirst(element);
             }
-            foreach (var receiveMessageType in result.ReceiveMessageTypes)
+            foreach (var deserialisableType in dasherAssemblyInfo.DeserialisableTypes)
             {
-                var message = XMLSchemaGenerator.GenerateSchema(receiveMessageType);
-                receivesMessagesElement.AddFirst(message);
+                var element = XMLSchemaGenerator.GenerateSchema(deserialisableType, serialisableTypeElementTag);
+                deserialisesTypesElement.AddFirst(element);
             }
 
-            appElement.Element(SENDS_MESSAGES_ELEMENT).ReplaceWith(sendsMessagesElement);
-            appElement.Element(RECEIVE_MESSAGES_ELEMENT).ReplaceWith(receivesMessagesElement);
+            rootElement.Element(serialisesTypesElementTag).ReplaceWith(serialisesTypesElement);
+            rootElement.Element(deserialisesTypesElementTag).ReplaceWith(deserialisesTypesElement);
 
-            doc.Save(appManifestFileName);
+            doc.Save(manifestFileName);
         }
     }
 }

@@ -26,7 +26,7 @@ namespace Dasher.Schema.Generation
             _usedAssemblies = new HashSet<string>();
             var dir = Path.GetDirectoryName(assembly.Location);
             var result = new DasherAssemblyInfo();
-            GetMessages(assembly, dir, result);
+            GetSerialisables(assembly, dir, result);
             return result;
         }
 
@@ -46,15 +46,16 @@ namespace Dasher.Schema.Generation
             }
         }
 
-        private void GetMessages(Assembly assembly, string dir, DasherAssemblyInfo result, int depth = 0)
+        private void GetSerialisables(Assembly assembly, string dir, DasherAssemblyInfo result, int depth = 0)
         {
             if (depth > 2) return; //just in case of circular references. Too large number slows down the whole operation
             foreach (var t in assembly.GetTypes())
             {
-                if (t.GetCustomAttributes(typeof(SendMessageAttribute), false).Any())
-                    result.SendMessageTypes.Add(t);
-                if (t.GetCustomAttributes(typeof(ReceiveMessageAttribute), false).Any())
-                    result.ReceiveMessageTypes.Add(t);
+                var attributes = t.GetCustomAttributes(typeof(DasherSerialisableAttribute), false).Cast<DasherSerialisableAttribute>().ToList();
+                if (attributes.Any(a => a.Usage == SupportedOperations.SerialiseOnly || a.Usage == SupportedOperations.SerialiseDeserialise))
+                    result.SerialisableTypes.Add(t);
+                if (attributes.Any(a => a.Usage == SupportedOperations.DeserialiseOnly || a.Usage == SupportedOperations.SerialiseDeserialise))
+                    result.DeserialisableTypes.Add(t);
             }
             var referencedAssemblyNames = GetFilteredReferencedAssemblyNames(assembly.GetReferencedAssemblies());
             foreach (var refAssemblyName in referencedAssemblyNames)
@@ -66,7 +67,7 @@ namespace Dasher.Schema.Generation
                     Debug.WriteLine($"Cannot load assembly {refAssemblyName.Name}");
                     continue;
                 }
-                GetMessages(refAssembly, dir, result, depth + 1);
+                GetSerialisables(refAssembly, dir, result, depth + 1);
             }
         }
 

@@ -1,22 +1,17 @@
-﻿using Xunit;
+﻿using System.Linq;
+using Xunit;
 
 namespace Dasher.Schema.Generation.Tests
 {
     public class LoadArgumentsTests
     {
-
-
-        public LoadArgumentsTests()
-        {
-
-        }
-
         [Fact]
         public void LoadArgumentTest()
         {
             AppArguments appArgs = new AppArguments();
-            appArgs.LoadArguments(new[] { @"--targetPath=C:\TargetPath", @"--targetDir=C:\TargetDir", @"--projectDir=C:\ProjectDir",
-                @"--includeDependencies=BP.*,Something", @"--excludeDependencies=Microsoft.*,BP.Synergy.App" });
+            appArgs.LoadArguments(new[] { @"--targetDir=C:\TargetDir", @"--targetPath=C:\TargetPath", @"--projectDir=C:\ProjectDir",
+                @"--outputFileName=app.manifest", @"--rootElementTag=App", @"--typeElementTag=Type", @"--serialisableTypesTag=SerialisableTypes",
+                @"--deserialisableTypesTag=DeserialisableTypes", @"--includeDependencies=BP.*,Something", @"--excludeDependencies=Microsoft.*,BP.Synergy.App" });
             ReturnCode retCode;
             Assert.True(appArgs.ValidateArguments(out retCode));
             Assert.Equal(ReturnCode.EXIT_SUCCESS, retCode);
@@ -30,6 +25,16 @@ namespace Dasher.Schema.Generation.Tests
         [Fact]
         public void MissingArgumentsTest()
         {
+            var mandatoryArgs =
+                new[]
+                {
+                    @"--targetDir=C:\TargetDir", @"--targetPath=C:\TargetPath", @"--projectDir=C:\ProjectDir", @"--outputFileName=app.manifest",
+                    @"--rootElementTag=App", @"--typeElementTag=Type", @"--serialisableTypesTag=SerialisableTypes", @"--deserialisableTypesTag=DeserialisableTypes"
+                };
+            foreach (var arg in mandatoryArgs)
+            {
+                MissingArgs(mandatoryArgs.Where(a => a != arg).ToArray());
+            }
             MissingArgs(new[] { @"--targetPath=C:\TargetPath", @"--targetDir=C:\TargetDir" });
             MissingArgs(new[] { @"--targetPath=C:\TargetPath" });
             MissingArgs(new[] { @"--targetPath=" });
