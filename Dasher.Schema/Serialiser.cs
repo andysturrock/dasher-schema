@@ -14,7 +14,7 @@ namespace Dasher.Schema
         private readonly Dasher.Serialiser<T> _inner;
 
         public void Serialise(Stream stream, T value) => _inner.Serialise(stream, value);
-        public void Serialise(UnsafePacker packer, T value) => _inner.Serialise(packer, value);
+        public void Serialise(Packer packer, T value) => _inner.Serialise(packer, value);
         public byte[] Serialise(T value) => _inner.Serialise(value);
  
         public static Serialiser<T> GetSerialiser(UnsupportedOperationBehaviour unsupportedOperationBehaviour = UnsupportedOperationBehaviour.Throw)
