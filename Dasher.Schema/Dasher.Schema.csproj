@@ -32,8 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Dasher, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dasher.0.4.6\lib\net45\Dasher.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\Dasher.0.8.0\lib\net45\Dasher.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
